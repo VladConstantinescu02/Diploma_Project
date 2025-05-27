@@ -1,22 +1,31 @@
 import 'package:flutter/material.dart';
-import 'features/homepage/screens/homepage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'config/routing/router_configuration.dart';
+
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    const ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomePage(),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(routerProvider);
+
+    return MaterialApp.router(
+      routerConfig: router,
+      title: 'App',
+      theme: ThemeData.dark(), // or light
     );
   }
 }
+
 
 
 
