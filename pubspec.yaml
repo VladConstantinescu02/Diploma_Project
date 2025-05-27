@@ -39,6 +39,8 @@ dependencies:
   go_router: ^13.0.1
   flutter_riverpod: ^2.4.0
 
+  lottie:
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -60,6 +62,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+      - lib/utils/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
