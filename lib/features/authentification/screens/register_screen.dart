@@ -143,7 +143,6 @@ class RegisterScreen extends ConsumerWidget {
                   ),
                   InkWell(
                     onTap: () {
-                      ref.read(authProvider.notifier).state = true;
                       context.go('/login');
                     },
                     child: Text(

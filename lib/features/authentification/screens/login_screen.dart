@@ -90,7 +90,8 @@ class LoginScreen extends ConsumerWidget {
                 onTap: () {
                   // Dummy placeholder
                   ref.read(authProvider.notifier).state = true;
-                  context.go('/home'); // after login
+                  ref.read(registeredProvider.notifier).state = true; // if already has profile
+                  context.go('/home'); // This works now
                 },
                 child: const Text(
                   "Log In",
@@ -111,10 +112,7 @@ class LoginScreen extends ConsumerWidget {
                 const Text("Don't have an account? ", style: TextStyle(fontSize: 16)),
                 InkWell(
                   onTap: () {
-                    ref.read(authProvider.notifier).state = true;
-                    ref.read(registeredProvider.notifier).state = false; // force unregistered state
-                    context.go('/home'); // or just let router handle this
-
+                    context.go('/register');
                   },
                   child: Text(
                     "Register Now!",
