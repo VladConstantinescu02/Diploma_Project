@@ -17,10 +17,37 @@ final registeredProvider = StateProvider<bool>((ref) => false);
 
 final routerProvider = Provider<GoRouter>((ref) {
   final isLoggedIn = ref.watch(authProvider);
-  final isRegistered = ref.watch(authProvider);
+  final isRegistered = ref.watch(registeredProvider);
 
   return GoRouter(
     initialLocation: '/login',
+    redirect: (context, state) {
+      final path = state.uri.path;
+      final isAtLogin = path == '/login';
+      final isAtRegister = path == '/register';
+
+      final isLoggedIn = ref.read(authProvider);
+      final isRegistered = ref.read(registeredProvider);
+
+      // Not logged in: block everything except /login and /register
+      if (!isLoggedIn && !isAtLogin && !isAtRegister) {
+        return '/login';
+      }
+
+      // Logged in but not registered: redirect only if trying to go into protected area
+      final isProtected = path != '/login' && path != '/register';
+      if (isLoggedIn && !isRegistered && isProtected && !isAtRegister) {
+        return '/register';
+      }
+
+      // Already registered → don't allow back to login/register
+      if (isLoggedIn && isRegistered && (isAtLogin || isAtRegister)) {
+        return '/home';
+      }
+
+      return null;
+    },
+
     routes: [
       GoRoute(
         path: '/login',
@@ -31,7 +58,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/register',
         name: 'Register',
         builder: (context, state) => RegisterScreen(),
-
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -72,33 +98,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
     ],
-
-      redirect: (context, state) {
-        final path = state.uri.path;
-        final isAtLogin = path == '/login';
-        final isAtRegister = path == '/register';
-
-        final isLoggedIn = ref.read(authProvider);
-        final isRegistered = ref.read(registeredProvider);
-
-        // User not logged in → allow login or register only
-        if (!isLoggedIn && !isAtLogin && !isAtRegister) {
-          return '/login';
-        }
-
-        // User logged in but not registered → force /register
-        if (isLoggedIn && !isRegistered && !isAtRegister) {
-          return '/register';
-        }
-
-        // If user is at login or register but already done → go to /home
-        if (isLoggedIn && isRegistered && (isAtLogin || isAtRegister)) {
-          return '/home';
-        }
-
-        return null;
-      }
-
-
   );
 });
+
