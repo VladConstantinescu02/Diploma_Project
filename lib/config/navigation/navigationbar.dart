@@ -11,7 +11,7 @@ class Navigation extends StatelessWidget {
     return Container(
       color: const Color(0xFFFF5733),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
         child: GNav(
           selectedIndex: navigationShell.currentIndex,
           onTabChange: (index) {
@@ -21,7 +21,7 @@ class Navigation extends StatelessWidget {
           color: Colors.white,
           activeColor: Colors.white,
           tabActiveBorder: Border.all(color: const Color(0xFFFAF3E0)),
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           gap: 10,
           tabs: const [
             GButton(icon: Icons.home_filled, text: 'Home'),

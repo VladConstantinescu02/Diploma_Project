@@ -1,3 +1,4 @@
+import 'package:diploma_prj/features/homepage/widgets/homepage_screen.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
@@ -5,8 +6,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Welcome to Home"),
-    );
+    return const HomeScreen();
   }
 }

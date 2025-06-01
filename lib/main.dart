@@ -4,11 +4,7 @@ import 'config/routing/router_configuration.dart';
 
 
 void main() {
-  runApp(
-    const ProviderScope(
-      child: MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -21,7 +17,7 @@ class MyApp extends ConsumerWidget {
     return MaterialApp.router(
       routerConfig: router,
       title: 'App',
-      theme: ThemeData.dark(), // or light
+      theme: ThemeData.light(), // or light
     );
   }
 }
