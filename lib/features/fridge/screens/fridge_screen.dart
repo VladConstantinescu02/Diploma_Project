@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:msa_cooking_app_client/features/fridge/models/get_fridge_ingredient.dart';
-import 'package:msa_cooking_app_client/features/fridge/providers/fridge_provider.dart';
-import 'package:msa_cooking_app_client/features/fridge/widgets/fridge_ingredient.dart';
-import 'package:msa_cooking_app_client/features/fridge/widgets/fridge_tile.dart';
-import 'package:msa_cooking_app_client/features/fridge/widgets/ingredient_dialog_box.dart';
-import 'package:msa_cooking_app_client/shared/models/search_ingredient.dart';
 
+import '../../../shared/models/search_ingredient.dart';
 import '../../../shared/widgets/search_ingredients.dart';
+import '../models/get_fridge_ingredient.dart';
+import '../providers/fridge_provider.dart';
 import '../widgets/add_fridge_ingredient_form.dart';
+import '../widgets/fridge_ingredient.dart';
+import '../widgets/ingredient_dialog_box.dart';
 
 class FridgeScreen extends ConsumerStatefulWidget {
   const FridgeScreen({super.key});

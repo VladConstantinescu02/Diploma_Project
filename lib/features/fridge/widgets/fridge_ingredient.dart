@@ -1,6 +1,9 @@
+import 'package:diploma_prj/features/fridge/widgets/update_fridge_ingredient_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/get_fridge_ingredient.dart';
+import '../providers/fridge_provider.dart';
 
 class FridgeIngredient extends ConsumerWidget {
   final GetFridgeIngredient fridgeIngredient;
