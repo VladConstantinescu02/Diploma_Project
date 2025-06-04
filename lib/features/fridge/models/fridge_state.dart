@@ -1,6 +1,5 @@
-import 'package:msa_cooking_app_client/features/fridge/models/get_fridge.dart';
-
 import '../../../shared/models/warning.dart';
+import 'get_fridge.dart';
 
 class FridgeState {
   final GetFridge? fridge;

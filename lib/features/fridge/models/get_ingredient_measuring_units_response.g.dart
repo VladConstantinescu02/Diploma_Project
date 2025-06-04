@@ -1,24 +1,12 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+import 'get_ingredient_measuring_unit.dart';
+import 'get_ingredient_measuring_units_response.dart';
 
-part of 'get_ingredient_measuring_units_response.dart';
+final mockGetIngredientMeasuringUnitsResponse = GetIngredientMeasuringUnitsResponse(
+  'Units retrieved successfully',
+  [
+    GetIngredientMeasuringUnit(1, 'Liter', 'liters'),
+    GetIngredientMeasuringUnit(2, 'Piece', 'pcs'),
+    GetIngredientMeasuringUnit(3, 'Kilogram', 'kg'),
+  ],
+);
 
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-GetIngredientMeasuringUnitsResponse
-    _$GetIngredientMeasuringUnitsResponseFromJson(Map<String, dynamic> json) =>
-        GetIngredientMeasuringUnitsResponse(
-          json['message'] as String,
-          (json['ingredientMeasuringUnits'] as List<dynamic>)
-              .map((e) => GetIngredientMeasuringUnit.fromJson(
-                  e as Map<String, dynamic>))
-              .toList(),
-        );
-
-Map<String, dynamic> _$GetIngredientMeasuringUnitsResponseToJson(
-        GetIngredientMeasuringUnitsResponse instance) =>
-    <String, dynamic>{
-      'message': instance.message,
-      'ingredientMeasuringUnits': instance.ingredientMeasuringUnits,
-    };

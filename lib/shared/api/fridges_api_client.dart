@@ -1,123 +1,95 @@
-import 'dart:convert';
-import 'dart:developer';
-
-import 'package:http/http.dart' as http;
 import '../../features/fridge/models/add_fridge_ingredient.dart';
 import '../../features/fridge/models/add_fridge_ingredient_response.dart';
 import '../../features/fridge/models/delete_fridge_ingredient_response.dart';
+import '../../features/fridge/models/get_fridge.dart';
+import '../../features/fridge/models/get_fridge.g.dart';
+import '../../features/fridge/models/get_fridge_ingredient.dart';
 import '../../features/fridge/models/get_fridge_response.dart';
+import '../../features/fridge/models/get_ingredient_measuring_unit.dart';
 import '../../features/fridge/models/get_ingredient_measuring_units_response.dart';
 import '../errors/result.dart';
+import '../models/warning.dart';
 
 class FridgesApiClient {
-  final String _baseAddress;
-  final http.Client client;
-  final String token;
-
-  FridgesApiClient(this._baseAddress, this.client, this.token);
+  // Dummy constructor for mock API
+  FridgesApiClient(String _, dynamic __, String ___);
 
   Future<Result<GetFridgeResponse, Exception>> getFridge() async {
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
     try {
-      final response = await client.get(Uri.http(_baseAddress, "api/fridge"), headers: headers);
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        final responseFridge = GetFridgeResponse.fromJson(json);
-        return Success(responseFridge);
-      } else {
-        return Failure(Exception("No fridge"));
-      }
-    } on Exception catch (e) {
-      log("Error when retrieving fridge $e");
-      return Failure(Exception("Error on retrieving fridge"));
+      await Future.delayed(Duration(milliseconds: 500));
+
+      final fridge = GetFridge(
+        'My Fridge',
+        [
+          GetFridgeIngredient('id1', 'Tomato', 18.0, 2, 'pcs'),
+          GetFridgeIngredient('id2', 'Milk', 42.0, 1, 'liters'),
+          GetFridgeIngredient('id3', 'Cheese', 402.0, 3, 'kg'),
+        ],
+        ['allergen1', 'allergen2'],
+      );
+
+      final response = GetFridgeResponse(
+        'Fridge loaded successfully',
+        fridge,
+        [
+          Warning('Low stock: Milk'),
+          Warning('Cheese may expire soon'),
+        ],
+      );
+
+      return Success(response);
+    } catch (e) {
+      return Failure(Exception("Mocked error"));
     }
   }
 
-  Future<Result<DeleteFridgeIngredientResponse, Exception>> deleteFridgeIngredient(String fridgeIngredientId) async {
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
+  Future<Result<DeleteFridgeIngredientResponse, Exception>> deleteFridgeIngredient(
+      String fridgeIngredientId) async {
     try {
-      final response = await client.delete(Uri.http(_baseAddress, "api/fridge/ingredient", { 'fridgeIngredientId': fridgeIngredientId }), headers: headers);
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        final responseFridge = DeleteFridgeIngredientResponse.fromJson(json);
-        return Success(responseFridge);
-      } else {
-        return Failure(Exception("No fridge ingredient"));
-      }
-    } on Exception catch (e) {
-      log("Error when deleting fridge ingredient $e");
-      return Failure(Exception("Error on retrieving fridge ingredient"));
+      await Future.delayed(Duration(milliseconds: 300));
+      final response = DeleteFridgeIngredientResponse("Ingredient deleted: $fridgeIngredientId");
+      return Success(response);
+    } catch (e) {
+      return Failure(Exception("Mocked delete error"));
     }
   }
 
-  Future<Result<AddFridgeIngredientResponse, Exception>> addFridgeIngredient(AddFridgeIngredient addFridgeIngredient) async {
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
+  Future<Result<AddFridgeIngredientResponse, Exception>> addFridgeIngredient(
+      AddFridgeIngredient addFridgeIngredient) async {
     try {
-      final response = await client.post(Uri.http(_baseAddress, "api/fridge/ingredient"), headers: headers, body: jsonEncode(addFridgeIngredient));
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        final responseFridgeIngredient = AddFridgeIngredientResponse.fromJson(json);
-        return Success(responseFridgeIngredient);
-      } else {
-        return Failure(Exception("No fridge ingredient"));
-      }
-    } on Exception catch (e) {
-      log("Error when adding fridge ingredient $e");
-      return Failure(Exception("Error when adding fridge ingredient"));
+      await Future.delayed(Duration(milliseconds: 300));
+      final response = AddFridgeIngredientResponse("Ingredient added: ${addFridgeIngredient.ingredientId}");
+      return Success(response);
+    } catch (e) {
+      return Failure(Exception("Mocked add error"));
     }
   }
 
-  Future<Result<AddFridgeIngredientResponse, Exception>> updateFridgeIngredient(AddFridgeIngredient addFridgeIngredient) async {
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
+  Future<Result<AddFridgeIngredientResponse, Exception>> updateFridgeIngredient(
+      AddFridgeIngredient addFridgeIngredient) async {
     try {
-      final response = await client.put(Uri.http(_baseAddress, "api/fridge/ingredient"), headers: headers, body: jsonEncode(addFridgeIngredient));
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        final responseFridgeIngredient = AddFridgeIngredientResponse.fromJson(json);
-        return Success(responseFridgeIngredient);
-      } else {
-        return Failure(Exception("No fridge ingredient"));
-      }
-    } on Exception catch (e) {
-      log("Error when adding updating ingredient $e");
-      return Failure(Exception("Error when updating fridge ingredient"));
+      await Future.delayed(Duration(milliseconds: 300));
+      final response = AddFridgeIngredientResponse("Ingredient updated: ${addFridgeIngredient.ingredientId}");
+      return Success(response);
+    } catch (e) {
+      return Failure(Exception("Mocked update error"));
     }
   }
 
   Future<Result<GetIngredientMeasuringUnitsResponse, Exception>> getIngredientMeasuringUnits() async {
-    final headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token'
-    };
     try {
-      final response = await client.get(Uri.http(_baseAddress, "api/fridge/ingredients/measuring-units"), headers: headers);
-      if (response.statusCode == 200) {
-        final json = jsonDecode(response.body);
-        final responseIngredientMeasuringUnit = GetIngredientMeasuringUnitsResponse.fromJson(json);
-        return Success(responseIngredientMeasuringUnit);
-      } else {
-        return Failure(Exception("No ingredient measuring unit"));
-      }
-    } on Exception catch (e) {
-      log("Error when retrieving ingredient measuring units $e");
-      return Failure(Exception("Error on retrieving ingredient measuring units"));
+      await Future.delayed(Duration(milliseconds: 300));
+      final response = GetIngredientMeasuringUnitsResponse(
+        'Units loaded successfully',
+        [
+          GetIngredientMeasuringUnit(1, 'Liter', 'liters'),
+          GetIngredientMeasuringUnit(2, 'Piece', 'pcs'),
+          GetIngredientMeasuringUnit(3, 'Kilogram', 'kg'),
+        ],
+      );
+      return Success(response);
+    } catch (e) {
+      return Failure(Exception("Mocked unit fetch error"));
     }
   }
 }

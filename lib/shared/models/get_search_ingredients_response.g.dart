@@ -1,21 +1,15 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+import 'package:diploma_prj/shared/models/search_ingredient.dart';
 
-part of 'get_search_ingredients_response.dart';
+import 'get_search_ingredients_response.dart';
 
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-GetSearchIngredientsResponse _$GetSearchIngredientsResponseFromJson(
-        Map<String, dynamic> json) =>
-    GetSearchIngredientsResponse(
-      (json['results'] as List<dynamic>)
-          .map((e) => SearchIngredient.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$GetSearchIngredientsResponseToJson(
-        GetSearchIngredientsResponse instance) =>
-    <String, dynamic>{
-      'results': instance.results,
-    };
+Future<GetSearchIngredientsResponse> getMockSearchResults(String query) async {
+  await Future.delayed(Duration(milliseconds: 300)); // simulate delay
+  final all = [
+    SearchIngredient('ing1', 'Tomato'),
+    SearchIngredient('ing2', 'Cheddar Cheese'),
+    SearchIngredient('ing3', 'Milk'),
+    SearchIngredient('ing4', 'Butter'),
+  ];
+  final filtered = all.where((ing) => ing.name.toLowerCase().contains(query.toLowerCase())).toList();
+  return GetSearchIngredientsResponse(filtered);
+}

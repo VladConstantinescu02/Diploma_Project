@@ -2,8 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/search_ingredient.dart';
-import '../providers/ingredients_api_client_provider.dart';
 import '../errors/result.dart';
+import '../providers/ingredients_api_client_provider.dart';
 
 class SearchIngredients extends ConsumerStatefulWidget {
   final void Function(SearchIngredient ingredient) onIngredientSelected;

@@ -1,22 +1,7 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+import 'add_fridge_ingredient.dart';
 
-part of 'add_fridge_ingredient.dart';
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-AddFridgeIngredient _$AddFridgeIngredientFromJson(Map<String, dynamic> json) =>
-    AddFridgeIngredient(
-      json['ingredientId'] as String,
-      (json['ingredientQuantity'] as num).toDouble(),
-      (json['ingredientMeasuringUnitId'] as num).toInt(),
-    );
-
-Map<String, dynamic> _$AddFridgeIngredientToJson(
-        AddFridgeIngredient instance) =>
-    <String, dynamic>{
-      'ingredientId': instance.ingredientId,
-      'ingredientQuantity': instance.ingredientQuantity,
-      'ingredientMeasuringUnitId': instance.ingredientMeasuringUnitId,
-    };
+final mockFridgeIngredients = [
+  AddFridgeIngredient('abc123', 2.5, 1),
+  AddFridgeIngredient('def456', 1.0, 2),
+  AddFridgeIngredient('ghi789', 3.75, 3),
+];

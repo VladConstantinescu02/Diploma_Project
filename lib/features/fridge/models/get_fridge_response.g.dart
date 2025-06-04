@@ -1,23 +1,22 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+import '../../../shared/models/warning.dart';
+import 'get_fridge.dart';
+import 'get_fridge.g.dart';
+import 'get_fridge_ingredient.dart';
+import 'get_fridge_response.dart';
 
-part of 'get_fridge_response.dart';
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-GetFridgeResponse _$GetFridgeResponseFromJson(Map<String, dynamic> json) =>
-    GetFridgeResponse(
-      json['message'] as String,
-      GetFridge.fromJson(json['fridge'] as Map<String, dynamic>),
-      (json['warnings'] as List<dynamic>)
-          .map((e) => Warning.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-
-Map<String, dynamic> _$GetFridgeResponseToJson(GetFridgeResponse instance) =>
-    <String, dynamic>{
-      'message': instance.message,
-      'fridge': instance.fridge,
-      'warnings': instance.warnings,
-    };
+final mockFridgeResponse = GetFridgeResponse(
+  'Fridge loaded successfully',
+  GetFridge(
+    'My Fridge',
+    [
+      GetFridgeIngredient('id1', 'Tomato', 18.0, 2, 'pcs'),
+      GetFridgeIngredient('id2', 'Milk', 42.0, 1, 'liters'),
+      GetFridgeIngredient('id3', 'Cheese', 402.0, 3, 'kg'),
+    ],
+    ['allergen1', 'allergen2'],
+  ),
+  [
+    Warning('Low quantity for Milk'),
+    Warning('Cheese may expire soon'),
+  ],
+);

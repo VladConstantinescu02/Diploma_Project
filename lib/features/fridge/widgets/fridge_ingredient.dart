@@ -84,7 +84,7 @@ class FridgeIngredient extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${fridgeIngredient.caloriesPer100Grams.toStringAsFixed(1)} cal/100g',
+                      '${fridgeIngredient.caloriesPer100Grams?.toStringAsFixed(1)} cal/100g',
                       style: TextStyle(
                         fontSize: 14,
                       ),

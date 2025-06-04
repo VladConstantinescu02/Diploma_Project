@@ -1,26 +1,13 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+import 'get_fridge.dart';
+import 'get_fridge.g.dart';
+import 'get_fridge_ingredient.dart';
 
-part of 'get_fridge_ingredient.dart';
-
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-GetFridgeIngredient _$GetFridgeIngredientFromJson(Map<String, dynamic> json) =>
-    GetFridgeIngredient(
-      json['ingredientId'] as String,
-      json['name'] as String,
-      (json['caloriesPer100Grams'] as num).toDouble(),
-      (json['quantity'] as num).toDouble(),
-      json['ingredientMeasuringUnitSuffix'] as String,
-    );
-
-Map<String, dynamic> _$GetFridgeIngredientToJson(
-        GetFridgeIngredient instance) =>
-    <String, dynamic>{
-      'ingredientId': instance.ingredientId,
-      'name': instance.name,
-      'caloriesPer100Grams': instance.caloriesPer100Grams,
-      'quantity': instance.quantity,
-      'ingredientMeasuringUnitSuffix': instance.ingredientMeasuringUnitSuffix,
-    };
+final mockFridge = GetFridge(
+      'My Fridge',
+      [
+            GetFridgeIngredient('id1', 'Tomato', 18.0, 2, 'pcs'),
+            GetFridgeIngredient('id2', 'Milk', 42.0, 1, 'liters'),
+            GetFridgeIngredient('id3', 'Cheese', 402.0, 3, 'kg'),
+      ],
+      ['allergen1', 'allergen2'],
+);

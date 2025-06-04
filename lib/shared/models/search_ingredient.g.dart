@@ -1,19 +1,9 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+import 'package:diploma_prj/shared/models/search_ingredient.dart';
 
-part of 'search_ingredient.dart';
+import 'get_search_ingredients_response.dart';
 
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-SearchIngredient _$SearchIngredientFromJson(Map<String, dynamic> json) =>
-    SearchIngredient(
-      json['id'] as String,
-      json['name'] as String,
-    );
-
-Map<String, dynamic> _$SearchIngredientToJson(SearchIngredient instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-    };
+final mockSearchIngredientsResponse = GetSearchIngredientsResponse([
+  SearchIngredient('ing1', 'Tomato'),
+  SearchIngredient('ing2', 'Cheddar Cheese'),
+  SearchIngredient('ing3', 'Milk'),
+]);

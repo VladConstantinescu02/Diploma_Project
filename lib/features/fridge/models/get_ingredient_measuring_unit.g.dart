@@ -1,23 +1,8 @@
-// GENERATED CODE - DO NOT MODIFY BY HAND
+import 'get_ingredient_measuring_unit.dart';
 
-part of 'get_ingredient_measuring_unit.dart';
+final mockMeasuringUnits = [
+  GetIngredientMeasuringUnit(1, 'Liter', 'liters'),
+  GetIngredientMeasuringUnit(2, 'Piece', 'pcs'),
+  GetIngredientMeasuringUnit(3, 'Kilogram', 'kg'),
+];
 
-// **************************************************************************
-// JsonSerializableGenerator
-// **************************************************************************
-
-GetIngredientMeasuringUnit _$GetIngredientMeasuringUnitFromJson(
-        Map<String, dynamic> json) =>
-    GetIngredientMeasuringUnit(
-      (json['id'] as num).toInt(),
-      json['unitName'] as String,
-      json['unitSuffix'] as String,
-    );
-
-Map<String, dynamic> _$GetIngredientMeasuringUnitToJson(
-        GetIngredientMeasuringUnit instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'unitName': instance.unitName,
-      'unitSuffix': instance.unitSuffix,
-    };

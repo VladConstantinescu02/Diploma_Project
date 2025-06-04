@@ -1,19 +1,17 @@
-
-import 'package:json_annotation/json_annotation.dart';
-
-part "get_fridge_ingredient.g.dart";
-
-@JsonSerializable()
 class GetFridgeIngredient {
   final String ingredientId;
   final String name;
-  final double caloriesPer100Grams;
   final double quantity;
+  final int measuringUnitId;
   final String ingredientMeasuringUnitSuffix;
+  final double? caloriesPer100Grams; // optional
 
-  GetFridgeIngredient(this.ingredientId, this.name, this.caloriesPer100Grams, this.quantity, this.ingredientMeasuringUnitSuffix);
-  factory GetFridgeIngredient.fromJson(Map<String, dynamic> json) =>
-      _$GetFridgeIngredientFromJson(json);
-
-  Map<String, dynamic> toJson() => _$GetFridgeIngredientToJson(this);
+  GetFridgeIngredient(
+      this.ingredientId,
+      this.name,
+      this.quantity,
+      this.measuringUnitId,
+      this.ingredientMeasuringUnitSuffix, {
+        this.caloriesPer100Grams,
+      });
 }

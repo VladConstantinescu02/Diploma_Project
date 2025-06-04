@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import '../../../shared/models/search_ingredient.dart';
 import '../../../shared/widgets/search_ingredients.dart';
 import '../models/get_fridge_ingredient.dart';
