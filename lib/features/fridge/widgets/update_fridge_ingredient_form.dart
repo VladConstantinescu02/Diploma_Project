@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:msa_cooking_app_client/features/fridge/providers/fridge_provider.dart';
-import 'package:msa_cooking_app_client/features/fridge/providers/ingredient_measuring_units_provider.dart';
 
 import '../models/add_fridge_ingredient.dart';
+import '../providers/fridge_provider.dart';
+import '../providers/ingredient_measuring_units_provider.dart';
 
 class UpdateFridgeIngredientForm extends ConsumerStatefulWidget {
   final String _ingredientId;
