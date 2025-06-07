@@ -5,9 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../features/authentication/screens/authentication_screen.dart';
 import '../../features/fridge/screens/fridge_screen.dart';
 import '../../features/homepage/screens/homepage.dart';
+import '../../features/profile/screens/profile_screen.dart';
 import '../navigation/navigation.dart';
 import '../../features/meals/screens/meals_screen.dart';
-import '../../features/profile/profile_screen.dart';
+
 
 
 final authProvider = StateProvider<bool>((ref) => false);
