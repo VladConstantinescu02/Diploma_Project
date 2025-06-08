@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "507657497619",
+    "project_id": "diplomaprj-290fd",
+    "storage_bucket": "diplomaprj-290fd.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:507657497619:android:73cfe208f3bcc36953e3e6",
+        "android_client_info": {
+          "package_name": "com.example.diploma_prj"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBX7-ei_Z-ngJu0Lf7ieoqRpadcnNGC5xs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
