@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/authentication/screens/authentication_screen.dart';
+import '../../features/authentication/screens/login_screen.dart';
 import '../../features/fridge/screens/fridge_screen.dart';
 import '../../features/homepage/screens/homepage.dart';
 import '../../features/profile/screens/edit_profile_screen.dart';
-import '../navigation/navigationbar.dart';
+import '../navigation/navigation.dart';
 import '../../features/meals/screens/meals_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 
@@ -56,7 +56,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
           path: '/editProfile',
-          name: 'EditPrfile',
+          name: 'EditProfile',
           builder: (context, state) => const EditProfileScreen(),
       ),
       StatefulShellRoute.indexedStack(
