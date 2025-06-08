@@ -12,7 +12,7 @@ const Color secondaryColor = Colors.grey;
 class LoginScreen extends ConsumerWidget {
   LoginScreen({super.key});
 
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -23,14 +23,14 @@ class LoginScreen extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               "Application",
               style: TextStyle(
                   color: buttonColor,
                   fontSize: 30,
                   fontWeight: FontWeight.w900),
             ),
-            Text(
+            const Text(
               "Login",
               style: TextStyle(
                   fontSize: 23,
@@ -46,9 +46,9 @@ class LoginScreen extends ConsumerWidget {
                   ? const EdgeInsets.symmetric(horizontal: 350)
                   : const EdgeInsets.symmetric(horizontal: 25),
               child: TextField(
-                controller: _usernameController,
+                controller: _emailController,
                 decoration: const InputDecoration(
-                  labelText: "username",
+                  labelText: "email",
                   prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
                 ),
@@ -82,35 +82,33 @@ class LoginScreen extends ConsumerWidget {
                   : const EdgeInsets.symmetric(horizontal: 25),
               height: 55,
               alignment: Alignment.center,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: buttonColor,
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                borderRadius: BorderRadius.all(Radius.circular(8)),
               ),
               child: InkWell(
                 onTap: () async {
                   final password = _passwordController.text.trim();
-                  final username = _usernameController.text.trim();
+                  final email = _emailController.text.trim();
 
                   final authService = ref.read(authServiceProvider);
 
                   try {
                     // Create the account
                     await authService.signIn(
-                        username: username, password: password);
-
-                    // Optionally update the display name
-                    await authService.updateUsername(username: username);
+                        email: email, password: password,
+                    );
 
                     // Update UI state or navigate
-                    ref.read(registeredProvider.notifier).state = true;
+                    ref.read(loginProvider.notifier).state = true;
                     context.go('/home'); // This works now
                   } catch (e) {
-                    print("Registration failed: $e");
+                    print("Login failed: $e");
                     // Show error to user
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: const Text(
-                            "Failed to sign in, please check your credentials"),
+                            "Failed to log in, please check your credentials"),
                         backgroundColor: Colors.redAccent,
                         action: SnackBarAction(
                             textColor: Colors.white,
@@ -143,7 +141,7 @@ class LoginScreen extends ConsumerWidget {
                   onTap: () {
                     context.go('/register');
                   },
-                  child: Text(
+                  child: const Text(
                     "Register Now!",
                     style: TextStyle(fontSize: 18, color: secondaryColor),
                   ),

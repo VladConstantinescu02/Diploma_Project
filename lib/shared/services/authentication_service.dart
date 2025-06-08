@@ -23,13 +23,13 @@ class AuthenticationService {
   //SignIn method, requires two parameters
   Future<UserCredential> signIn({
     //User's email
-    required String username,
+    required String email,
     //User's password
     required String password,
   }) async {
     // Uses the FirebaseAuth instance to sign in an user with the provided email and password.
     return await firebaseAuth.signInWithEmailAndPassword(
-        email: username, password: password);
+        email: email, password: password);
   }
 
   // Uses the FirebaseAuth instance to create an user, with the same requirements as before.
