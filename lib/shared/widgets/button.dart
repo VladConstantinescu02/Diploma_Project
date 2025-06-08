@@ -15,7 +15,14 @@ class MyButton extends StatelessWidget {
     return MaterialButton(
       onPressed: onPressed,
       color: Colors.black,
-      child: Text(contentText, style: const TextStyle(color: Colors.white)),
+      shape: const StadiumBorder(),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Text(
+          contentText,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
     );
   }
 }

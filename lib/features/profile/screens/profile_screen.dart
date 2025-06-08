@@ -1,4 +1,6 @@
+import 'package:diploma_prj/shared/widgets/button.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../widgets/profile_photo.dart';
 import '../widgets/user_info.dart';
 
@@ -21,10 +23,7 @@ class ProfileScreen extends StatelessWidget {
         child: Column(
           children: [
             const ProfilePic(image: "https://i.postimg.cc/cCsYDjvj/user-2.png"),
-            Text(
-              "Annette Black",
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+
             const Divider(height: 16.0 * 2),
             const Info(
               infoKey: "Username",
@@ -46,11 +45,24 @@ class ProfileScreen extends StatelessWidget {
                     minimumSize: const Size(double.infinity, 48),
                     shape: const StadiumBorder(),
                   ),
-                  onPressed: () {},
+                  onPressed: () {
+                    context.go('/editProfile');
+                  },
                   child: const Text("Edit profile"),
                 ),
               ),
             ),
+            const Divider(height: 16.0 * 2),
+
+            Align(
+              alignment: Alignment.centerLeft,
+              child: MyButton(
+                  contentText: 'LogOut',
+                  onPressed: () {
+                    context.go('/login');
+                  }
+              ),
+            )
           ],
         ),
       ),
