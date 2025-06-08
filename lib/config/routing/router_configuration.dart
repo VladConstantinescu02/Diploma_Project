@@ -1,3 +1,4 @@
+import 'package:diploma_prj/features/authentication/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,10 +11,8 @@ import '../navigation/navigation.dart';
 import '../../features/meals/screens/meals_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 
-
 final authProvider = StateProvider<bool>((ref) => false);
 final registeredProvider = StateProvider<bool>((ref) => false);
-
 
 final routerProvider = Provider<GoRouter>((ref) {
   final isLoggedIn = ref.watch(authProvider);
@@ -47,7 +46,6 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       return null;
     },
-
     routes: [
       GoRoute(
         path: '/login',
@@ -55,9 +53,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => LoginScreen(),
       ),
       GoRoute(
-          path: '/editProfile',
-          name: 'EditProfile',
-          builder: (context, state) => const EditProfileScreen(),
+        path: '/register',
+        name: 'Register',
+        builder: (context, state) => RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/editProfile',
+        name: 'EditProfile',
+        builder: (context, state) => const EditProfileScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -100,4 +103,3 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
-

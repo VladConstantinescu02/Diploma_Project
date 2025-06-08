@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/routing/router_configuration.dart';
-
+import '../../../shared/services/authentication_service.dart';
 
 // Replace with actual colors or use default Material colors
 const Color buttonColor = Colors.orange;
@@ -12,7 +12,7 @@ const Color secondaryColor = Colors.grey;
 class LoginScreen extends ConsumerWidget {
   LoginScreen({super.key});
 
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -46,9 +46,9 @@ class LoginScreen extends ConsumerWidget {
                   ? const EdgeInsets.symmetric(horizontal: 350)
                   : const EdgeInsets.symmetric(horizontal: 25),
               child: TextField(
-                controller: _emailController,
+                controller: _usernameController,
                 decoration: const InputDecoration(
-                  labelText: "Enter email",
+                  labelText: "username",
                   prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
                 ),
@@ -66,7 +66,7 @@ class LoginScreen extends ConsumerWidget {
                 controller: _passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(
-                  labelText: "Enter Password",
+                  labelText: "password",
                   prefixIcon: Icon(Icons.lock),
                   border: OutlineInputBorder(),
                 ),
@@ -87,11 +87,39 @@ class LoginScreen extends ConsumerWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
               ),
               child: InkWell(
-                onTap: () {
-                  // Dummy placeholder
-                  ref.read(authProvider.notifier).state = true;
-                  ref.read(registeredProvider.notifier).state = true; // if already has profile
-                  context.go('/home'); // This works now
+                onTap: () async {
+                  final password = _passwordController.text.trim();
+                  final username = _usernameController.text.trim();
+
+                  final authService = ref.read(authServiceProvider);
+
+                  try {
+                    // Create the account
+                    await authService.signIn(
+                        username: username, password: password);
+
+                    // Optionally update the display name
+                    await authService.updateUsername(username: username);
+
+                    // Update UI state or navigate
+                    ref.read(registeredProvider.notifier).state = true;
+                    context.go('/home'); // This works now
+                  } catch (e) {
+                    print("Registration failed: $e");
+                    // Show error to user
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text(
+                            "Failed to sign in, please check your credentials"),
+                        backgroundColor: Colors.redAccent,
+                        action: SnackBarAction(
+                            textColor: Colors.white,
+                            label: 'Ok',
+                            onPressed: () {}),
+                      ),
+                    );
+                  }
+                  ;
                 },
                 child: const Text(
                   "Log In",
@@ -109,7 +137,8 @@ class LoginScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text("Don't have an account? ", style: TextStyle(fontSize: 16)),
+                const Text("Don't have an account? ",
+                    style: TextStyle(fontSize: 16)),
                 InkWell(
                   onTap: () {
                     context.go('/register');

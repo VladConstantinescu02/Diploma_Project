@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../config/routing/router_configuration.dart';
-import 'login_screen.dart';
+import '../../../shared/services/authentication_service.dart';
 
 const Color buttonColor = Colors.orange;
 const Color secondaryColor = Colors.grey;
 
 class RegisterScreen extends ConsumerWidget {
-  RegisterScreen({Key? key}) : super(key: key);
+  RegisterScreen({super.key});
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -24,7 +24,7 @@ class RegisterScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 "Application",
                 style: TextStyle(
                   color: buttonColor,
@@ -33,24 +33,6 @@ class RegisterScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 25),
-
-              const Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundImage: NetworkImage(
-                      'https://www.pngitem.com/pimgs/m/150-1503945_transparent-user-png-default-user-image-png-png.png',
-                    ),
-                    backgroundColor: Colors.grey,
-                  ),
-                  Positioned(
-                    bottom: 30,
-                    left: 28,
-                    child: Icon(Icons.upload, color: Colors.black, size: 34),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
 
               // Email
               Container(
@@ -112,14 +94,39 @@ class RegisterScreen extends ConsumerWidget {
                     : const EdgeInsets.symmetric(horizontal: 25),
                 height: 50,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: buttonColor,
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  borderRadius: BorderRadius.all(Radius.circular(8)),
                 ),
                 child: InkWell(
-                  onTap: () {
-                    ref.read(registeredProvider.notifier).state = true;
-                    context.go('/home');
+                  onTap: () async {
+                    final email = _emailController.text.trim();
+                    final password = _passwordController.text.trim();
+                    final username = _usernameController.text.trim();
+
+                    final authService = ref.read(authServiceProvider);
+
+                    try {
+                      // Create the account
+                      await authService.createAccount(email: email, password: password);
+
+                      // Optionally update the display name
+                      await authService.updateUsername(username: username);
+
+                      // Update UI state or navigate
+                      ref.read(registeredProvider.notifier).state = true;
+                      context.go('/fridge');
+                    } catch (e) {
+                      print("Registration failed: $e");
+                      // Show error to user
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: const Text("Failed to register, please add valid credentials"),
+                            backgroundColor: Colors.redAccent,
+                            action: SnackBarAction(textColor: Colors.white, label: 'Ok', onPressed: () { }),
+                        ),
+                      );
+                    }
                   },
                   child: const Text(
                     "Sign up",
@@ -145,7 +152,7 @@ class RegisterScreen extends ConsumerWidget {
                     onTap: () {
                       context.go('/login');
                     },
-                    child: Text(
+                    child: const Text(
                       "Login",
                       style: TextStyle(fontSize: 18, color: secondaryColor),
                     ),
