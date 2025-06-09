@@ -1,4 +1,5 @@
-import 'package:diploma_prj/features/authentication/widgets/text_box_widget.dart';
+import 'package:diploma_prj/shared/services/authentication_service.dart';
+import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -77,9 +78,29 @@ class RegisterScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.all(Radius.circular(8)),
                   ),
                   child: InkWell(
-                    onTap: () {
-                      ref.read(registeredProvider.notifier).state = true;
-                      context.go('/home');
+                    onTap: () async {
+                      final email = _emailController.text.trim();
+                      final password = _passwordController.text.trim();
+
+                      final authService = ref.read(authServiceProvider);
+
+
+
+                      if (!context.mounted) return;
+
+                      try {
+                        // Create the account
+                        await authService.createAccount(email: email, password: password);
+
+
+                        ref.read(registeredProvider.notifier).state = true;
+                        context.go('/home');
+
+                      } catch(e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Failed to register: ${e.toString()}")),
+                        );
+                      }
                     },
                     child: const Text(
                       "Sign up",
