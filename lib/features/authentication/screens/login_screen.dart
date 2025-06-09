@@ -1,3 +1,4 @@
+import 'package:diploma_prj/shared/services/authentication_service.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -43,11 +44,12 @@ class LoginScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.all(12.0),
               child: MyControllerTextbox(
-                textBoxController: _emailController,
-                textBoxLabel: 'Email address',
-                textBoxIcon: Icons.email_outlined,
+                  textBoxController: _emailController,
+                  textBoxLabel: 'Email',
+                  textBoxIcon: Icons.email_outlined,
               ),
             ),
+
 
             // Password Text Field
             Padding(
@@ -73,12 +75,25 @@ class LoginScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.all(Radius.circular(48)),
                 ),
                 child: InkWell(
-                  onTap: () {
-                    // Dummy placeholder
-                    ref.read(authProvider.notifier).state = true;
-                    ref.read(registeredProvider.notifier).state =
-                        true; // if already has profile
-                    context.go('/home'); // This works now
+                  onTap: () async{
+                      final email = _emailController.text.trim();
+                      final password = _passwordController.text.trim();
+
+                      final authService = ref.read(authServiceProvider);
+
+                      if(!context.mounted) return;
+
+                      try {
+                        await authService.signIn(email: email, password: password);
+
+                        ref.read(registeredProvider.notifier).state = true;
+                        context.go('/home');
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Failed to signin: ${e.toString()}")),
+                        );
+                      }
+
                   },
                   child: const Text(
                     "Log In",
