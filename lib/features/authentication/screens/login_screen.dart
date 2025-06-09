@@ -70,7 +70,7 @@ class LoginScreen extends ConsumerWidget {
                 alignment: Alignment.center,
                 decoration: const BoxDecoration(
                   color: buttonColor,
-                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                  borderRadius: BorderRadius.all(Radius.circular(48)),
                 ),
                 child: InkWell(
                   onTap: () {
