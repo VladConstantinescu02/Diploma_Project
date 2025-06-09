@@ -28,7 +28,9 @@ class MyControllerTextbox extends StatelessWidget {
         decoration: InputDecoration(
           labelText: textBoxLabel,
           prefixIcon: Icon(textBoxIcon),
-          border: const OutlineInputBorder(),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(48),
+          ),
         ),
       ),
     );
