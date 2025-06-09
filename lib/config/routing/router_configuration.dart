@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/authentication/screens/authentication_screen.dart';
+import '../../features/authentication/screens/login_screen.dart';
+import '../../features/authentication/screens/register_screen.dart';
 import '../../features/fridge/screens/fridge_screen.dart';
 import '../../features/homepage/screens/homepage.dart';
 import '../navigation/navigation.dart';
@@ -51,7 +52,12 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/login',
         name: 'Login',
-        builder: (context, state) => const LoginScreen(),
+        builder: (context, state) => LoginScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        name: 'Register',
+        builder: (context, state) => RegisterScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
