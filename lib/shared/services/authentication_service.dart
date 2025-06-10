@@ -15,6 +15,12 @@ class AuthenticationService {
   //Used said object to get access to the current user
   User? get currentUser => firebaseAuth.currentUser;
 
+  // Getter used to return the display name (username) of the current user
+  String? get username => currentUser?.displayName;
+
+  // Getter used to return the email of the current user
+  String? get email => currentUser?.email;
+
   //Used to find the state of the current user, if they are connected or not
   Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
 
@@ -115,4 +121,5 @@ class AuthenticationService {
     // Update the user's password
     await currentUser!.updatePassword(newPassword);
   }
+
 }
