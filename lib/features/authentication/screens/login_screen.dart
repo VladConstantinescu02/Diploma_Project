@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../config/routing/router_configuration.dart';
 
 // Replace with actual colors or use default Material colors
 const Color buttonColor = Colors.orange;
@@ -85,8 +84,6 @@ class LoginScreen extends ConsumerWidget {
 
                       try {
                         await authService.signIn(email: email, password: password);
-
-                        ref.read(registeredProvider.notifier).state = true;
                         context.go('/home');
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(

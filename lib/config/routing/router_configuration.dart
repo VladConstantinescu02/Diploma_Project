@@ -1,62 +1,64 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
+// Screens
 import '../../features/authentication/screens/login_screen.dart';
 import '../../features/authentication/screens/register_screen.dart';
 import '../../features/fridge/screens/fridge_screen.dart';
 import '../../features/homepage/screens/homepage.dart';
+import '../../shared/services/authentication_service.dart';
 import '../navigation/navigation.dart';
 import '../../features/meals/screens/meals_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 
 
-final authProvider = StateProvider<bool>((ref) => false);
-final registeredProvider = StateProvider<bool>((ref) => false);
 
+final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
+/// Expose Firebase Auth Stream from your service
+final authStateProvider = StreamProvider<User?>((ref) {
+  return ref.watch(authServiceProvider).authStateChanges;
+});
+
+/// Main router provider
 final routerProvider = Provider<GoRouter>((ref) {
-  final isLoggedIn = ref.watch(authProvider);
-  final isRegistered = ref.watch(registeredProvider);
+  final authAsync = ref.watch(authStateProvider);
 
   return GoRouter(
+    navigatorKey: _rootNavigatorKey,
     initialLocation: '/login',
+    debugLogDiagnostics: true,
+
     redirect: (context, state) {
       final path = state.uri.path;
+      final isLoggedIn = authAsync.value != null;
+
       final isAtLogin = path == '/login';
       final isAtRegister = path == '/register';
 
-      final isLoggedIn = ref.read(authProvider);
-      final isRegistered = ref.read(registeredProvider);
+      // Wait for auth state to load
+      if (authAsync.isLoading) return null;
 
-      // Not logged in: block everything except /login and /register
       if (!isLoggedIn && !isAtLogin && !isAtRegister) {
         return '/login';
       }
 
-      // Logged in but not registered: redirect only if trying to go into protected area
-      final isProtected = path != '/login' && path != '/register';
-      if (isLoggedIn && !isRegistered && isProtected && !isAtRegister) {
-        return '/register';
-      }
-
-      // Already registered → don't allow back to login/register
-      if (isLoggedIn && isRegistered && (isAtLogin || isAtRegister)) {
+      if (isLoggedIn && (isAtLogin || isAtRegister)) {
         return '/home';
       }
 
-      return null;
+      return null; // No redirect needed
     },
 
     routes: [
       GoRoute(
         path: '/login',
-        name: 'Login',
         builder: (context, state) => LoginScreen(),
       ),
       GoRoute(
         path: '/register',
-        name: 'Register',
         builder: (context, state) => RegisterScreen(),
       ),
       StatefulShellRoute.indexedStack(
@@ -70,28 +72,24 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/home',
-              name: 'Home',
               builder: (context, state) => const HomePage(),
             ),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/fridge',
-              name: 'Fridge',
               builder: (context, state) => const FridgeScreen(),
             ),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/meals',
-              name: 'Meals',
               builder: (context, state) => const MealsScreen(),
             ),
           ]),
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/profile',
-              name: 'Profile',
               builder: (context, state) => const ProfileScreen(),
             ),
           ]),
@@ -100,4 +98,3 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
   );
 });
-
