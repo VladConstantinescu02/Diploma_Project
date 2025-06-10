@@ -80,6 +80,7 @@ class RegisterScreen extends ConsumerWidget {
                     onTap: () async {
                       final email = _emailController.text.trim();
                       final password = _passwordController.text.trim();
+                      final username = _usernameController.text.trim();
 
                       final authService = ref.read(authServiceProvider);
 
@@ -90,6 +91,7 @@ class RegisterScreen extends ConsumerWidget {
                       try {
                         // Create the account
                         await authService.createAccount(email: email, password: password);
+                        await authService.updateUsername(username: username);
 
                         context.go('/home');
 
