@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diploma_prj/shared/services/authentication_service.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -84,14 +85,22 @@ class RegisterScreen extends ConsumerWidget {
 
                       final authService = ref.read(authServiceProvider);
 
-
-
                       if (!context.mounted) return;
 
                       try {
                         // Create the account
+                        final userCredential = await authService.createAccount(email: email, password: password);
                         await authService.createAccount(email: email, password: password);
                         await authService.updateUsername(username: username);
+
+                        final uid = userCredential.user?.uid;
+                        final userAdd = FirebaseFirestore.instance.collection('users').doc(uid);
+
+                        await userAdd.set({
+                          'usernme': _usernameController,
+                          'email' : _emailController,
+                        });
+
 
                         context.go('/home');
 
