@@ -85,23 +85,23 @@ class RegisterScreen extends ConsumerWidget {
 
                       final authService = ref.read(authServiceProvider);
 
-                      if (!context.mounted) return;
-
                       try {
                         // Create the account
                         final userCredential = await authService.createAccount(email: email, password: password);
-                        await authService.createAccount(email: email, password: password);
-                        await authService.updateUsername(username: username);
-
                         final uid = userCredential.user?.uid;
-                        final userAdd = FirebaseFirestore.instance.collection('users').doc(uid);
+                        final user = userCredential.user;
+                        if (user == null) throw Exception('User creation failed');
 
-                        await userAdd.set({
-                          'usernme': _usernameController,
-                          'email' : _emailController,
+                        await user.updateDisplayName(username);
+
+                        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+                          'username': username,
+                          'email': email,
                         });
 
 
+
+                        if (!context.mounted) return;
                         context.go('/home');
 
                       } catch(e) {
