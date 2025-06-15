@@ -1,5 +1,7 @@
+import 'package:diploma_prj/features/profile/services/delete_user_service.dart';
 import 'package:diploma_prj/features/profile/widgets/info_display_widget.dart';
-import 'package:diploma_prj/shared/widgets/alert_dailog_box.dart';
+import 'package:diploma_prj/shared/widgets/alert_dialog_box.dart';
+import 'package:diploma_prj/shared/widgets/two_textbox_dialog_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../shared/services/authentication_service.dart';
+import '../../../shared/widgets/one_textbox_dialog_box.dart';
+import '../../authentication/services/authentication_service_error_handling.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -27,15 +31,16 @@ class ProfileScreen extends ConsumerWidget {
         title: const Text("Profile"),
         actions: <Widget>[
           ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                backgroundColor: const Color(0xFFFF5733),
-                foregroundColor: Colors.white,
-                side: const BorderSide(width: 1, color: Colors.white),
-              ),
-              onPressed: () {},
-              icon: const Icon(Icons.edit),
-            label: const Text("Edit Theme"),)
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              backgroundColor: const Color(0xFFFF5733),
+              foregroundColor: Colors.white,
+              side: const BorderSide(width: 1, color: Colors.white),
+            ),
+            onPressed: () {},
+            icon: const Icon(Icons.edit),
+            label: const Text("Edit Theme"),
+          )
         ],
       ),
       body: SingleChildScrollView(
@@ -91,7 +96,6 @@ class ProfileScreen extends ConsumerWidget {
             ),
             Row(
               children: [
-
                 SizedBox(
                   width: 180,
                   child: ElevatedButton(
@@ -119,7 +123,21 @@ class ProfileScreen extends ConsumerWidget {
                       minimumSize: const Size(double.infinity, 48),
                       shape: const StadiumBorder(),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => OneTextBoxDialogBox(
+                          title: 'Your new username',
+                          label: 'Username',
+                          icon: Icons.person_2_outlined,
+                          onSubmit: (username) {
+                            if (kDebugMode) {
+                              print('Username $email');
+                            }
+                          },
+                        ),
+                      );
+                    },
                     child: const Text("Edit Password"),
                   ),
                 ),
@@ -142,7 +160,6 @@ class ProfileScreen extends ConsumerWidget {
             ),
             Row(
               children: [
-
                 SizedBox(
                   width: 180,
                   child: ElevatedButton(
@@ -156,22 +173,40 @@ class ProfileScreen extends ConsumerWidget {
                     onPressed: () {
                       showDialog(
                         context: context,
-                        builder: (context) => TemplateDialogBox(
-                          title: 'Warning!',
-                          content: 'Are you sure you want to delete your account?',
-                          confirmText: 'Yes I am sure',
-                          cancelText: 'Cancel',
-                          onConfirm: () {
-                            // Handle confirm action
-                            if (kDebugMode) {
-                              print('Account deleted');
+                        builder: (context) => TwoInputDialogBox(
+                          title: 'Delete your account',
+                          label1: 'Enter your email',
+                          label2: 'Enter your password',
+                          icon1: Icons.email_outlined,
+                          icon2: Icons.password_outlined,
+                          onSubmit: (email, password) async {
+                            try {
+                              final deleteUserService =
+                                  ref.read(deleteUserServiceProvider);
+                              await deleteUserService.deleteAccount(
+                                  email: email, password: password);
+                            } on FirebaseAuthException catch (e) {
+                              if (!context.mounted) return;
+
+                              String errorMessage =
+                                  getFirebaseAuthErrorMessage(e);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(errorMessage),
+                                    backgroundColor: const Color(0xFF8B1E3F)),
+                              );
+                            } catch (e) {
+                              if (!context.mounted) return;
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text("An unexpected error occurred."),
+                                  backgroundColor: Color(0xFF8B1E3F),
+                                ),
+                              );
                             }
-                          }, textButtonColorConfirm: Colors.red,
-                        onCancel: () {
-                            if (kDebugMode) {
-                              print('Cancelled');
-                            }
-                          }, textButtonColorCancel: Colors.black,
+                          },
                         ),
                       );
                     },
@@ -205,18 +240,20 @@ class ProfileScreen extends ConsumerWidget {
                               await authService.signOut();
 
                               if (context.mounted) {
-                                context.go('/login');  // ✅ redirect to login after logout
+                                context.go('/login');
                               }
-
                             } on FirebaseAuthException catch (e) {
-                              print(e.message);
+                              if (kDebugMode) {
+                                print(e.message);
+                              }
                             }
                           },
                           onCancel: () {
                             if (kDebugMode) {
                               print('Cancelled');
                             }
-                          }, textButtonColorCancel: Colors.black,
+                          },
+                          textButtonColorCancel: Colors.black,
                         ),
                       );
                     },
@@ -224,7 +261,8 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
               ],
-            ),          ],
+            ),
+          ],
         ),
       ),
     );
