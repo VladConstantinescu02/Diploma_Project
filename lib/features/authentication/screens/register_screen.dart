@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:diploma_prj/shared/services/authentication_service.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../services/authentication_service_error_handling.dart';
 
 const Color buttonColor = Colors.orange;
 const Color secondaryColor = Colors.grey;
@@ -47,11 +49,11 @@ class RegisterScreen extends ConsumerWidget {
 
               // Username
               Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: MyControllerTextbox(
-                      textBoxController: _usernameController,
-                      textBoxLabel: 'Your username',
-                      textBoxIcon: Icons.supervised_user_circle_outlined),
+                padding: const EdgeInsets.all(12.0),
+                child: MyControllerTextbox(
+                    textBoxController: _usernameController,
+                    textBoxLabel: 'Your username',
+                    textBoxIcon: Icons.supervised_user_circle_outlined),
               ),
 
               // Password
@@ -83,30 +85,53 @@ class RegisterScreen extends ConsumerWidget {
                       final password = _passwordController.text.trim();
                       final username = _usernameController.text.trim();
 
+                      if (username.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Username is required.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
                       final authService = ref.read(authServiceProvider);
 
                       try {
                         // Create the account
-                        final userCredential = await authService.createAccount(email: email, password: password);
-                        final uid = userCredential.user?.uid;
+                        final userCredential = await authService.createAccount(
+                            email: email, password: password);
                         final user = userCredential.user;
-                        if (user == null) throw Exception('User creation failed');
+                        if (user == null) {
+                          throw Exception('User creation failed');
+                        }
 
                         await user.updateDisplayName(username);
 
-                        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+                        await FirebaseFirestore.instance
+                            .collection('users')
+                            .doc(user.uid)
+                            .set({
+                          'userID': user.uid,
                           'username': username,
                           'email': email,
+                          'profilePhoto': '',
                         });
-
-
 
                         if (!context.mounted) return;
                         context.go('/home');
+                      } catch (e) {
+                        String errorMessage = 'Failed to register';
 
-                      } catch(e) {
+                        if (e is FirebaseAuthException) {
+                          errorMessage = getFirebaseAuthErrorMessage(e);
+                        }
+
                         ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Failed to register: ${e.toString()}")),
+                          SnackBar(
+                            content: Text(errorMessage),
+                            backgroundColor: Colors.red,
+                          ),
                         );
                       }
                     },
