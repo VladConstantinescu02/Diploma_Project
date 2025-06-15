@@ -13,43 +13,39 @@ import '../navigation/navigation.dart';
 import '../../features/meals/screens/meals_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 
-
-
+/// Global root navigator key for shell route
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 
-/// Expose Firebase Auth Stream from your service
+/// Expose Firebase Auth stream from your service using Riverpod
 final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(authServiceProvider).authStateChanges;
 });
 
-/// Main router provider
+/// GoRouter provider that reacts to auth state changes
 final routerProvider = Provider<GoRouter>((ref) {
-  final authAsync = ref.watch(authStateProvider);
+  final authState = ref.watch(authStateProvider);
 
   return GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/login',
-    debugLogDiagnostics: true,
-
+    debugLogDiagnostics: true, // optional, helps debugging router behavior
     redirect: (context, state) {
-      final path = state.uri.path;
-      final isLoggedIn = authAsync.value != null;
+      if (authState.isLoading) return null; // Do not redirect while still loading
 
-      final isAtLogin = path == '/login';
-      final isAtRegister = path == '/register';
+      final user = authState.value;
 
-      // Wait for auth state to load
-      if (authAsync.isLoading) return null;
+      final isAtLogin = state.uri.toString() == '/login';
+      final isAtRegister = state.uri.toString() == '/register';
 
-      if (!isLoggedIn && !isAtLogin && !isAtRegister) {
+      if (user == null && !isAtLogin && !isAtRegister) {
         return '/login';
       }
 
-      if (isLoggedIn && (isAtLogin || isAtRegister)) {
+      if (user != null && isAtLogin) {
         return '/home';
       }
 
-      return null; // No redirect needed
+      return null; // no redirection needed
     },
 
     routes: [

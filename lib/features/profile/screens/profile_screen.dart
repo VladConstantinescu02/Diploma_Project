@@ -1,6 +1,10 @@
 import 'package:diploma_prj/features/profile/widgets/info_display_widget.dart';
+import 'package:diploma_prj/shared/widgets/alert_dailog_box.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../shared/services/authentication_service.dart';
 
@@ -21,6 +25,18 @@ class ProfileScreen extends ConsumerWidget {
         backgroundColor: const Color(0xFFFF5733),
         foregroundColor: Colors.white,
         title: const Text("Profile"),
+        actions: <Widget>[
+          ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: const Color(0xFFFF5733),
+                foregroundColor: Colors.white,
+                side: const BorderSide(width: 1, color: Colors.white),
+              ),
+              onPressed: () {},
+              icon: const Icon(Icons.edit),
+            label: const Text("Edit Theme"),)
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -75,25 +91,9 @@ class ProfileScreen extends ConsumerWidget {
             ),
             Row(
               children: [
+
                 SizedBox(
-                  width: 140,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: Colors.black12,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 48),
-                      shape: const StadiumBorder(),
-                    ),
-                    onPressed: () {},
-                    child: const Text("Edit Theme"),
-                  ),
-                ),
-                const Spacer(
-                  flex: 1,
-                ),
-                SizedBox(
-                  width: 140,
+                  width: 180,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
@@ -110,7 +110,7 @@ class ProfileScreen extends ConsumerWidget {
                   flex: 1,
                 ),
                 SizedBox(
-                  width: 140,
+                  width: 180,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
@@ -140,7 +140,91 @@ class ProfileScreen extends ConsumerWidget {
                     )),
               ),
             ),
-          ],
+            Row(
+              children: [
+
+                SizedBox(
+                  width: 180,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 48),
+                      shape: const StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => TemplateDialogBox(
+                          title: 'Warning!',
+                          content: 'Are you sure you want to delete your account?',
+                          confirmText: 'Yes I am sure',
+                          cancelText: 'Cancel',
+                          onConfirm: () {
+                            // Handle confirm action
+                            if (kDebugMode) {
+                              print('Account deleted');
+                            }
+                          }, textButtonColorConfirm: Colors.red,
+                        onCancel: () {
+                            if (kDebugMode) {
+                              print('Cancelled');
+                            }
+                          }, textButtonColorCancel: Colors.black,
+                        ),
+                      );
+                    },
+                    child: const Text("Delete account"),
+                  ),
+                ),
+                const Spacer(
+                  flex: 1,
+                ),
+                SizedBox(
+                  width: 180,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: const Color(0xFFFF5733),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 48),
+                      shape: const StadiumBorder(),
+                    ),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => TemplateDialogBox(
+                          title: 'You are about to log out!',
+                          content: 'Are you sure?',
+                          confirmText: 'Yup',
+                          cancelText: 'Stay logged in',
+                          textButtonColorConfirm: Colors.red,
+                          onConfirm: () async {
+                            try {
+                              await authService.signOut();
+
+                              if (context.mounted) {
+                                context.go('/login');  // ✅ redirect to login after logout
+                              }
+
+                            } on FirebaseAuthException catch (e) {
+                              print(e.message);
+                            }
+                          },
+                          onCancel: () {
+                            if (kDebugMode) {
+                              print('Cancelled');
+                            }
+                          }, textButtonColorCancel: Colors.black,
+                        ),
+                      );
+                    },
+                    child: const Text("Log Out"),
+                  ),
+                ),
+              ],
+            ),          ],
         ),
       ),
     );
