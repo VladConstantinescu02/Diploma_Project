@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:diploma_prj/features/authentication/screens/login_screen.dart';
 import 'package:diploma_prj/shared/services/authentication_service.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,8 +10,9 @@ import 'package:go_router/go_router.dart';
 
 import '../services/authentication_service_error_handling.dart';
 
-const Color buttonColor = Colors.orange;
-const Color secondaryColor = Colors.grey;
+const Color mainColor = Color(0xFFF27507);
+const Color secondaryColor = Color(0xFF3C4C59);
+const Color backGroundColor = Color(0xFFFAFAF9);
 
 class RegisterScreen extends ConsumerWidget {
   RegisterScreen({super.key});
@@ -24,14 +26,15 @@ class RegisterScreen extends ConsumerWidget {
     return Scaffold(
       body: Container(
         alignment: Alignment.center,
+        color: backGroundColor,
         child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                "Application",
+                "Nice to meet you!",
                 style: TextStyle(
-                  color: buttonColor,
+                  color: mainColor,
                   fontSize: 30,
                   fontWeight: FontWeight.w900,
                 ),
@@ -42,27 +45,39 @@ class RegisterScreen extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: MyControllerTextbox(
-                    textBoxController: _emailController,
-                    textBoxLabel: 'Your Email',
-                    textBoxIcon: Icons.email_outlined),
+                  textBoxController: _emailController,
+                  textBoxLabel: 'Your Email',
+                  textBoxIcon: Icons.email_outlined,
+                  textLabelColor: darkColor,
+                  textBoxFocusedColor: mainColor,
+                  textBoxStaticColor: secondaryColor,
+                ),
               ),
 
               // Username
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: MyControllerTextbox(
-                    textBoxController: _usernameController,
-                    textBoxLabel: 'Your username',
-                    textBoxIcon: Icons.supervised_user_circle_outlined),
+                  textBoxController: _usernameController,
+                  textBoxLabel: 'Your username',
+                  textBoxIcon: Icons.supervised_user_circle_outlined,
+                  textLabelColor: darkColor,
+                  textBoxFocusedColor: mainColor,
+                  textBoxStaticColor: secondaryColor,
+                ),
               ),
 
               // Password
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: MyControllerTextbox(
-                    textBoxController: _passwordController,
-                    textBoxLabel: 'Your password',
-                    textBoxIcon: Icons.password_outlined),
+                  textBoxController: _passwordController,
+                  textBoxLabel: 'Your password',
+                  textBoxIcon: Icons.password_outlined,
+                  textLabelColor: darkColor,
+                  textBoxFocusedColor: mainColor,
+                  textBoxStaticColor: secondaryColor,
+                ),
               ),
 
               // Sign Up Button
@@ -76,7 +91,7 @@ class RegisterScreen extends ConsumerWidget {
                   height: 50,
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
-                    color: buttonColor,
+                    color: mainColor,
                     borderRadius: BorderRadius.all(Radius.circular(48)),
                   ),
                   child: InkWell(
@@ -130,7 +145,7 @@ class RegisterScreen extends ConsumerWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(errorMessage),
-                            backgroundColor: Colors.red,
+                            backgroundColor: const Color(0xFF8B1E3F),
                           ),
                         );
                       }
@@ -154,7 +169,7 @@ class RegisterScreen extends ConsumerWidget {
                 children: [
                   const Text(
                     "Already have an account? ",
-                    style: TextStyle(fontSize: 16),
+                    style: TextStyle(fontSize: 16, color: secondaryColor),
                   ),
                   InkWell(
                     onTap: () {
@@ -162,7 +177,10 @@ class RegisterScreen extends ConsumerWidget {
                     },
                     child: const Text(
                       "Login",
-                      style: TextStyle(fontSize: 18, color: secondaryColor),
+                      style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: mainColor),
                     ),
                   ),
                 ],

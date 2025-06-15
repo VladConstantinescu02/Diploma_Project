@@ -69,6 +69,10 @@ class AuthenticationService {
     await currentUser?.updateDisplayName(username);
   }
 
+  /* Re-authenticates the current user using their current password,
+   then updates their password to a new one.
+   */
+
   /* Deletes the currently signed-in user's account after re-authenticating
    with their email and password. Signs the user out afterward.
    */
@@ -95,10 +99,6 @@ class AuthenticationService {
     // Sign out the user from Firebase
     await firebaseAuth.signOut();
   }
-
-  /* Re-authenticates the current user using their current password,
-   then updates their password to a new one.
-   */
   Future<void> resetPasswordFromCurrentPassword({
     // String for current password
     required String currentPassword,
