@@ -3,26 +3,107 @@ import 'package:diploma_prj/features/authentication/screens/login_screen.dart';
 import 'package:diploma_prj/shared/services/authentication_service.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
-import '../services/authentication_service_error_handling.dart';
+import '../../../shared/errors/authentication_service_error_handling.dart';
+
 
 const Color mainColor = Color(0xFFF27507);
 const Color secondaryColor = Color(0xFF3C4C59);
 const Color backGroundColor = Color(0xFFFAFAF9);
 
-class RegisterScreen extends ConsumerWidget {
-  RegisterScreen({super.key});
+class RegisterScreen extends ConsumerStatefulWidget {
+  const RegisterScreen({super.key});
 
+  @override
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
 
+  Uint8List? pickedImage;
+
+  Future<void> pickProfileImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      final imageBytes = await image.readAsBytes();
+      setState(() => pickedImage = imageBytes);
+    }
+  }
+
+  Future<void> register() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final username = _usernameController.text.trim();
+
+    if (username.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Username is required.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final authService = ref.read(authServiceProvider);
+
+    try {
+      final userCredential = await authService.createAccount(email: email, password: password);
+      final user = userCredential.user;
+
+      if (user == null) {
+        throw Exception('User creation failed');
+      }
+
+      await user.updateDisplayName(username);
+
+      String? profilePhotoUrl;
+      if (pickedImage != null) {
+        final imageRef = FirebaseStorage.instance.ref().child("users/${user.uid}/profile_picture.jpg");
+        await imageRef.putData(pickedImage!);
+        profilePhotoUrl = await imageRef.getDownloadURL();
+      }
+
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'userID': user.uid,
+        'username': username,
+        'email': email,
+        'profilePhoto': profilePhotoUrl ?? '',
+      });
+
+      if (!mounted) return;
+      context.go('/home');
+
+    } catch (e) {
+      String errorMessage = 'Failed to register';
+
+      if (e is FirebaseAuthException) {
+        errorMessage = getFirebaseAuthErrorMessage(e);
+      }
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: const Color(0xFF8B1E3F),
+        ),
+      );
+    }
+  }
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
         alignment: Alignment.center,
@@ -39,6 +120,19 @@ class RegisterScreen extends ConsumerWidget {
                   fontWeight: FontWeight.w900,
                 ),
               ),
+
+              GestureDetector(
+                onTap: pickProfileImage,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: const Color(0xFFD5E5F2),
+                  backgroundImage: pickedImage != null ? MemoryImage(pickedImage!) : null,
+                  child: pickedImage == null
+                      ? const Icon(Icons.person_add, size: 35, color: Color(0xFF3C4C59))
+                      : null,
+                ),
+              ),
+
               const SizedBox(height: 25),
 
               // Email
@@ -95,61 +189,7 @@ class RegisterScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.all(Radius.circular(48)),
                   ),
                   child: InkWell(
-                    onTap: () async {
-                      final email = _emailController.text.trim();
-                      final password = _passwordController.text.trim();
-                      final username = _usernameController.text.trim();
-
-                      if (username.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Username is required.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                        return;
-                      }
-
-                      final authService = ref.read(authServiceProvider);
-
-                      try {
-                        // Create the account
-                        final userCredential = await authService.createAccount(
-                            email: email, password: password);
-                        final user = userCredential.user;
-                        if (user == null) {
-                          throw Exception('User creation failed');
-                        }
-
-                        await user.updateDisplayName(username);
-
-                        await FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(user.uid)
-                            .set({
-                          'userID': user.uid,
-                          'username': username,
-                          'email': email,
-                          'profilePhoto': '',
-                        });
-
-                        if (!context.mounted) return;
-                        context.go('/home');
-                      } catch (e) {
-                        String errorMessage = 'Failed to register';
-
-                        if (e is FirebaseAuthException) {
-                          errorMessage = getFirebaseAuthErrorMessage(e);
-                        }
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(errorMessage),
-                            backgroundColor: const Color(0xFF8B1E3F),
-                          ),
-                        );
-                      }
-                    },
+                    onTap: register,  // 🔥 Only call register() directly
                     child: const Text(
                       "Sign up",
                       style: TextStyle(
@@ -161,6 +201,7 @@ class RegisterScreen extends ConsumerWidget {
                   ),
                 ),
               ),
+
               const SizedBox(height: 18),
 
               // Login Prompt

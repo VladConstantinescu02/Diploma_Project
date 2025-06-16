@@ -1,6 +1,7 @@
-import 'package:diploma_prj/features/profile/services/delete_user_service.dart';
+import 'package:diploma_prj/features/authentication/services/delete_user_service.dart';
 import 'package:diploma_prj/features/profile/widgets/info_display_widget.dart';
 import 'package:diploma_prj/shared/widgets/alert_dialog_box.dart';
+import 'package:diploma_prj/shared/widgets/three_textbox_dialog_box.dart';
 import 'package:diploma_prj/shared/widgets/two_textbox_dialog_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -10,10 +11,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../../shared/services/authentication_service.dart';
 import '../../../shared/widgets/one_textbox_dialog_box.dart';
-import '../../authentication/services/authentication_service_error_handling.dart';
+import '../../../shared/errors/authentication_service_error_handling.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
+
+  get pickProfileImage => null;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -47,6 +50,17 @@ class ProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           children: [
+            GestureDetector(
+              onTap: pickProfileImage,
+              child: CircleAvatar(
+                radius: 50,
+                backgroundColor: const Color(0xFFD5E5F2),
+                backgroundImage: pickedImage != null ? MemoryImage(pickedImage!) : null,
+                child: pickedImage == null
+                    ? const Icon(Icons.person_add, size: 35, color: Color(0xFF3C4C59))
+                    : null,
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Align(
@@ -106,8 +120,53 @@ class ProfileScreen extends ConsumerWidget {
                       minimumSize: const Size(double.infinity, 48),
                       shape: const StadiumBorder(),
                     ),
-                    onPressed: () {},
-                    child: const Text("Edit Username"),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => ThreeTextBoxDialogBox(
+                          title: 'Update your password',
+                          label1: 'Email',
+                          label2: 'Old password',
+                          label3: 'New password',
+                          icon1: Icons.email_outlined,
+                          icon2: Icons.password_outlined,
+                          icon3: Icons.edit,
+                          buttonColor: const Color(0xFFF27507),
+                          buttonTextColor: const Color(0xFFFAFAF9),
+                          buttonText: 'Confirm',
+                          dialogBackgroundColor: const Color(0xFFFAFAF9),
+                          onSubmit:
+                              (currentPassword, newPassword, email) async {
+                                try {
+                                  await authService.resetPasswordFromCurrentPassword(
+                                    currentPassword: currentPassword,
+                                    newPassword: newPassword,
+                                    email: email,
+                                  );
+
+                                  if (!context.mounted) return;
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Password updated successfully!"),
+                                      backgroundColor: Colors.green,
+                                    ),
+                                  );
+                                } on Exception catch (e) {
+                                  if (!context.mounted) return;
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text("Failed to update password: ${e.toString()}"),
+                                      backgroundColor: const Color(0xFF8B1E3F),
+                                    ),
+                                  );
+                                }
+                              },
+                        ),
+                      );
+                    },
+                    child: const Text("Update password"),
                   ),
                 ),
                 const Spacer(
@@ -127,18 +186,33 @@ class ProfileScreen extends ConsumerWidget {
                       showDialog(
                         context: context,
                         builder: (context) => OneTextBoxDialogBox(
-                          title: 'Your new username',
-                          label: 'Username',
-                          icon: Icons.person_2_outlined,
-                          onSubmit: (username) {
-                            if (kDebugMode) {
-                              print('Username $email');
+                          title: 'Reset your password!',
+                          label: 'Email',
+                          icon: Icons.emergency_rounded,
+                          buttonColor: const Color(0xFFF27507),
+                          buttonText: 'Reset',
+                          buttonTextColor: const Color(0xFFFAFAF9),
+                          dialogBackgroundColor: const Color(0xFFFAFAF9),
+                          onSubmit: (email) async {
+                            try {
+                              await authService.resetPassword(email: email);
+                            } on FirebaseAuthException catch (e) {
+                              String errorMessage =
+                                  getFirebaseAuthErrorMessage(e);
+
+                              if (!context.mounted) return;
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(errorMessage),
+                                    backgroundColor: const Color(0xFF8B1E3F)),
+                              );
                             }
                           },
                         ),
                       );
                     },
-                    child: const Text("Edit Password"),
+                    child: const Text("Reset Password"),
                   ),
                 ),
               ],
@@ -148,9 +222,7 @@ class ProfileScreen extends ConsumerWidget {
               alignment: Alignment.centerLeft,
               child: Padding(
                 padding: EdgeInsets.symmetric(vertical: 20),
-                child: Text(
-                    ''
-                    'Danger zone',
+                child: Text('Danger zone',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w600,
@@ -179,6 +251,10 @@ class ProfileScreen extends ConsumerWidget {
                           label2: 'Enter your password',
                           icon1: Icons.email_outlined,
                           icon2: Icons.password_outlined,
+                          buttonColor: const Color(0xFF8B1E3F),
+                          buttonTextColor: const Color(0xFFFAFAF9),
+                          buttonText: 'Goodbye!',
+                          dialogBackgroundColor: const Color(0xFFFAFAF9),
                           onSubmit: (email, password) async {
                             try {
                               final deleteUserService =
@@ -232,9 +308,13 @@ class ProfileScreen extends ConsumerWidget {
                         builder: (context) => TemplateDialogBox(
                           title: 'You are about to log out!',
                           content: 'Are you sure?',
-                          confirmText: 'Yup',
+                          confirmText: 'Yup!',
                           cancelText: 'Stay logged in',
-                          textButtonColorConfirm: Colors.red,
+                          backgroundColor: const Color(0xFFFAFAF9),
+                          textButtonColorCancel: const Color(0xFFFAFAF9),
+                          buttonCancel: const Color(0xFFF27507),
+                          buttonConfirm: const Color(0xFF8B1E3F),
+                          textButtonColorConfirm: const Color(0xFFFAFAF9),
                           onConfirm: () async {
                             try {
                               await authService.signOut();
@@ -253,7 +333,7 @@ class ProfileScreen extends ConsumerWidget {
                               print('Cancelled');
                             }
                           },
-                          textButtonColorCancel: Colors.black,
+                          
                         ),
                       );
                     },
