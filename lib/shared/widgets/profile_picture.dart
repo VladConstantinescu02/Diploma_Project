@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import '../services/image_storage_service.dart';
+import '../services/profile_image_handling_service.dart';
 
 class ProfilePictureWidget extends StatefulWidget {
   const ProfilePictureWidget({super.key});

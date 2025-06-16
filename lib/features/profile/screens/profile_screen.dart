@@ -1,4 +1,4 @@
-import 'package:diploma_prj/features/authentication/services/delete_user_service.dart';
+import 'package:diploma_prj/features/profile/services/delete_user_service.dart';
 import 'package:diploma_prj/features/profile/widgets/info_display_widget.dart';
 import 'package:diploma_prj/shared/widgets/alert_dialog_box.dart';
 import 'package:diploma_prj/shared/widgets/three_textbox_dialog_box.dart';
@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import '../../../shared/services/authentication_service.dart';
 import '../../../shared/widgets/one_textbox_dialog_box.dart';
 import '../../../shared/errors/authentication_service_error_handling.dart';
+import '../../../shared/widgets/profile_picture.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -50,19 +51,12 @@ class ProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           children: [
-            GestureDetector(
-              onTap: pickProfileImage,
-              child: CircleAvatar(
-                radius: 50,
-                backgroundColor: const Color(0xFFD5E5F2),
-                backgroundImage: pickedImage != null ? MemoryImage(pickedImage!) : null,
-                child: pickedImage == null
-                    ? const Icon(Icons.person_add, size: 35, color: Color(0xFF3C4C59))
-                    : null,
-              ),
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: ProfilePictureWidget(),
             ),
             Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(10.0),
               child: Align(
                 alignment: Alignment.center,
                 child: Row(
@@ -137,32 +131,35 @@ class ProfileScreen extends ConsumerWidget {
                           dialogBackgroundColor: const Color(0xFFFAFAF9),
                           onSubmit:
                               (currentPassword, newPassword, email) async {
-                                try {
-                                  await authService.resetPasswordFromCurrentPassword(
-                                    currentPassword: currentPassword,
-                                    newPassword: newPassword,
-                                    email: email,
-                                  );
+                            try {
+                              await authService
+                                  .resetPasswordFromCurrentPassword(
+                                currentPassword: currentPassword,
+                                newPassword: newPassword,
+                                email: email,
+                              );
 
-                                  if (!context.mounted) return;
+                              if (!context.mounted) return;
 
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text("Password updated successfully!"),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
-                                } on Exception catch (e) {
-                                  if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                      Text("Password updated successfully!"),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            } on Exception catch (e) {
+                              if (!context.mounted) return;
 
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text("Failed to update password: ${e.toString()}"),
-                                      backgroundColor: const Color(0xFF8B1E3F),
-                                    ),
-                                  );
-                                }
-                              },
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      "Failed to update password: ${e.toString()}"),
+                                  backgroundColor: const Color(0xFF8B1E3F),
+                                ),
+                              );
+                            }
+                          },
                         ),
                       );
                     },
@@ -237,7 +234,7 @@ class ProfileScreen extends ConsumerWidget {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
-                      backgroundColor: Colors.red,
+                      backgroundColor: const Color(0xFF8B1E3F),
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 48),
                       shape: const StadiumBorder(),
@@ -333,7 +330,6 @@ class ProfileScreen extends ConsumerWidget {
                               print('Cancelled');
                             }
                           },
-                          
                         ),
                       );
                     },
