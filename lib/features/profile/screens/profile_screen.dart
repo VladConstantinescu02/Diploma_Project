@@ -1,5 +1,6 @@
 import 'package:diploma_prj/features/profile/services/delete_user_service.dart';
 import 'package:diploma_prj/features/profile/widgets/info_display_widget.dart';
+import 'package:diploma_prj/features/profile/widgets/theme_change_widget.dart';
 import 'package:diploma_prj/shared/widgets/alert_dialog_box.dart';
 import 'package:diploma_prj/shared/widgets/three_textbox_dialog_box.dart';
 import 'package:diploma_prj/shared/widgets/two_textbox_dialog_box.dart';
@@ -17,33 +18,47 @@ import '../../../shared/widgets/profile_picture.dart';
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
-  get pickProfileImage => null;
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authService = ref.watch(authServiceProvider);
     final username = authService.username ?? 'there!';
     final email = authService.email ?? 'you@mail.com';
 
+    // Get theme-based colors:
+    final theme = Theme.of(context);
+    final primaryColor = theme.colorScheme.primary;
+    final backgroundColor = theme.scaffoldBackgroundColor;
+    final buttonColor = theme.colorScheme.secondary;
+    final dialogBackgroundColor = backgroundColor;
+    const dangerColor = Color(0xFF8B1E3F);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         centerTitle: false,
         elevation: 0,
-        backgroundColor: const Color(0xFFFF5733),
+        backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         title: const Text("Profile"),
         actions: <Widget>[
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              backgroundColor: const Color(0xFFFF5733),
-              foregroundColor: Colors.white,
-              side: const BorderSide(width: 1, color: Colors.white),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                side: const BorderSide(width: 1, color: Colors.white),
+              ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const ThemeSwitcher(),
+                );
+              },
+              icon: const Icon(Icons.edit),
+              label: const Text("Edit Theme"),
             ),
-            onPressed: () {},
-            icon: const Icon(Icons.edit),
-            label: const Text("Edit Theme"),
           )
         ],
       ),
@@ -60,7 +75,7 @@ class ProfileScreen extends ConsumerWidget {
               child: Align(
                 alignment: Alignment.center,
                 child: Row(
-                  mainAxisSize: MainAxisSize.min, // Keep it compact
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
                       'Hi ',
@@ -72,7 +87,6 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     Text(
                       username,
-                      // Replace with actual username variable if needed
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
@@ -83,11 +97,11 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ),
             ),
-            const Divider(height: 16.0 * 2),
+            const Divider(height: 32),
             MyInfo(infoText: username, titleText: 'User name:'),
             MyInfo(infoText: email, titleText: 'Email address:'),
             const SizedBox(height: 16.0),
-            const Divider(height: 16.0 * 2),
+            const Divider(height: 32),
             const Align(
               alignment: Alignment.centerLeft,
               child: Padding(
@@ -109,7 +123,7 @@ class ProfileScreen extends ConsumerWidget {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
-                      backgroundColor: const Color(0xFFFF5733),
+                      backgroundColor: buttonColor,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 48),
                       shape: const StadiumBorder(),
@@ -125,37 +139,30 @@ class ProfileScreen extends ConsumerWidget {
                           icon1: Icons.email_outlined,
                           icon2: Icons.password_outlined,
                           icon3: Icons.edit,
-                          buttonColor: const Color(0xFFF27507),
-                          buttonTextColor: const Color(0xFFFAFAF9),
+                          buttonColor: buttonColor,
+                          buttonTextColor: Colors.white,
                           buttonText: 'Confirm',
-                          dialogBackgroundColor: const Color(0xFFFAFAF9),
-                          onSubmit:
-                              (currentPassword, newPassword, email) async {
+                          dialogBackgroundColor: dialogBackgroundColor,
+                          onSubmit: (currentPassword, newPassword, email) async {
                             try {
-                              await authService
-                                  .resetPasswordFromCurrentPassword(
+                              await authService.resetPasswordFromCurrentPassword(
                                 currentPassword: currentPassword,
                                 newPassword: newPassword,
                                 email: email,
                               );
-
                               if (!context.mounted) return;
-
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content:
-                                      Text("Password updated successfully!"),
+                                  content: Text("Password updated successfully!"),
                                   backgroundColor: Colors.green,
                                 ),
                               );
                             } on Exception catch (e) {
                               if (!context.mounted) return;
-
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(
-                                      "Failed to update password: ${e.toString()}"),
-                                  backgroundColor: const Color(0xFF8B1E3F),
+                                  content: Text("Failed to update password: ${e.toString()}"),
+                                  backgroundColor: dangerColor,
                                 ),
                               );
                             }
@@ -166,15 +173,13 @@ class ProfileScreen extends ConsumerWidget {
                     child: const Text("Update password"),
                   ),
                 ),
-                const Spacer(
-                  flex: 1,
-                ),
+                const Spacer(),
                 SizedBox(
                   width: 180,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
-                      backgroundColor: const Color(0xFFFF5733),
+                      backgroundColor: buttonColor,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 48),
                       shape: const StadiumBorder(),
@@ -186,23 +191,20 @@ class ProfileScreen extends ConsumerWidget {
                           title: 'Reset your password!',
                           label: 'Email',
                           icon: Icons.emergency_rounded,
-                          buttonColor: const Color(0xFFF27507),
+                          buttonColor: buttonColor,
                           buttonText: 'Reset',
-                          buttonTextColor: const Color(0xFFFAFAF9),
-                          dialogBackgroundColor: const Color(0xFFFAFAF9),
+                          buttonTextColor: Colors.white,
+                          dialogBackgroundColor: dialogBackgroundColor,
                           onSubmit: (email) async {
                             try {
                               await authService.resetPassword(email: email);
                             } on FirebaseAuthException catch (e) {
-                              String errorMessage =
-                                  getFirebaseAuthErrorMessage(e);
-
+                              String errorMessage = getFirebaseAuthErrorMessage(e);
                               if (!context.mounted) return;
-
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                     content: Text(errorMessage),
-                                    backgroundColor: const Color(0xFF8B1E3F)),
+                                    backgroundColor: dangerColor),
                               );
                             }
                           },
@@ -214,7 +216,7 @@ class ProfileScreen extends ConsumerWidget {
                 ),
               ],
             ),
-            const Divider(height: 16.0 * 2),
+            const Divider(height: 32),
             const Align(
               alignment: Alignment.centerLeft,
               child: Padding(
@@ -234,7 +236,7 @@ class ProfileScreen extends ConsumerWidget {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
-                      backgroundColor: const Color(0xFF8B1E3F),
+                      backgroundColor: dangerColor,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 48),
                       shape: const StadiumBorder(),
@@ -248,33 +250,28 @@ class ProfileScreen extends ConsumerWidget {
                           label2: 'Enter your password',
                           icon1: Icons.email_outlined,
                           icon2: Icons.password_outlined,
-                          buttonColor: const Color(0xFF8B1E3F),
-                          buttonTextColor: const Color(0xFFFAFAF9),
+                          buttonColor: dangerColor,
+                          buttonTextColor: Colors.white,
                           buttonText: 'Goodbye!',
-                          dialogBackgroundColor: const Color(0xFFFAFAF9),
+                          dialogBackgroundColor: dialogBackgroundColor,
                           onSubmit: (email, password) async {
                             try {
-                              final deleteUserService =
-                                  ref.read(deleteUserServiceProvider);
-                              await deleteUserService.deleteAccount(
-                                  email: email, password: password);
+                              final deleteUserService = ref.read(deleteUserServiceProvider);
+                              await deleteUserService.deleteAccount(email: email, password: password);
                             } on FirebaseAuthException catch (e) {
                               if (!context.mounted) return;
-
-                              String errorMessage =
-                                  getFirebaseAuthErrorMessage(e);
+                              String errorMessage = getFirebaseAuthErrorMessage(e);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                    content: Text(errorMessage),
-                                    backgroundColor: const Color(0xFF8B1E3F)),
+                                  content: Text(errorMessage),
+                                  backgroundColor: dangerColor,
+                                ),
                               );
                             } catch (e) {
                               if (!context.mounted) return;
-
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content:
-                                      Text("An unexpected error occurred."),
+                                  content: Text("An unexpected error occurred."),
                                   backgroundColor: Color(0xFF8B1E3F),
                                 ),
                               );
@@ -286,15 +283,13 @@ class ProfileScreen extends ConsumerWidget {
                     child: const Text("Delete account"),
                   ),
                 ),
-                const Spacer(
-                  flex: 1,
-                ),
+                const Spacer(),
                 SizedBox(
                   width: 180,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
-                      backgroundColor: const Color(0xFFFF5733),
+                      backgroundColor: buttonColor,
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 48),
                       shape: const StadiumBorder(),
@@ -307,15 +302,14 @@ class ProfileScreen extends ConsumerWidget {
                           content: 'Are you sure?',
                           confirmText: 'Yup!',
                           cancelText: 'Stay logged in',
-                          backgroundColor: const Color(0xFFFAFAF9),
-                          textButtonColorCancel: const Color(0xFFFAFAF9),
-                          buttonCancel: const Color(0xFFF27507),
-                          buttonConfirm: const Color(0xFF8B1E3F),
-                          textButtonColorConfirm: const Color(0xFFFAFAF9),
+                          backgroundColor: dialogBackgroundColor,
+                          textButtonColorCancel: Colors.white,
+                          buttonCancel: buttonColor,
+                          buttonConfirm: dangerColor,
+                          textButtonColorConfirm: Colors.white,
                           onConfirm: () async {
                             try {
                               await authService.signOut();
-
                               if (context.mounted) {
                                 context.go('/login');
                               }
