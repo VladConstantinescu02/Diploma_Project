@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
-import '../services/authentication_service_error_handling.dart';
+import '../../../shared/errors/authentication_service_error_handling.dart';
 
 // Replace with actual colors or use default Material colors
 const Color mainColor = Color(0xFFF27507);

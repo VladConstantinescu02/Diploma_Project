@@ -11,6 +11,10 @@ class OneTextBoxDialogBox extends StatefulWidget {
   final String label;
   final IconData icon;
   final Function(String) onSubmit;
+  final Color buttonColor;
+  final String buttonText;
+  final Color buttonTextColor;
+  final Color dialogBackgroundColor;
 
   const OneTextBoxDialogBox({
     super.key,
@@ -18,6 +22,10 @@ class OneTextBoxDialogBox extends StatefulWidget {
     required this.label,
     required this.icon,
     required this.onSubmit,
+    required this.buttonColor,
+    required this.buttonText,
+    required this.buttonTextColor,
+    required this.dialogBackgroundColor,
   });
 
   @override
@@ -31,6 +39,7 @@ class _OneTextBoxDialogBoxState extends State<OneTextBoxDialogBox> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget.title),
+      backgroundColor: widget.dialogBackgroundColor,
       content: MyControllerTextbox(
         textBoxController: _controller,
         textBoxLabel: widget.label,
@@ -41,12 +50,22 @@ class _OneTextBoxDialogBoxState extends State<OneTextBoxDialogBox> {
       ),
       actions: [
         TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: widget.buttonColor,
+            foregroundColor: Colors.white,
+          ),
           onPressed: () {
             final input = _controller.text.trim();
             widget.onSubmit(input);
             Navigator.of(context).pop();
           },
-          child: const Text('Submit'),
+          child: Text(
+              widget.buttonText,
+            style: TextStyle(
+              color: widget.buttonTextColor,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
         ),
       ],
     );

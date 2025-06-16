@@ -14,6 +14,10 @@ class TwoInputDialogBox extends StatefulWidget {
   final IconData icon1;
   final IconData icon2;
   final Function(String, String) onSubmit;
+  final Color buttonColor;
+  final String buttonText;
+  final Color buttonTextColor;
+  final Color dialogBackgroundColor;
 
   const TwoInputDialogBox({
     super.key,
@@ -23,6 +27,10 @@ class TwoInputDialogBox extends StatefulWidget {
     required this.icon1,
     required this.icon2,
     required this.onSubmit,
+    required this.buttonColor,
+    required this.buttonText,
+    required this.buttonTextColor,
+    required this.dialogBackgroundColor,
   });
 
   @override
@@ -37,6 +45,7 @@ class _TwoInputDialogBoxState extends State<TwoInputDialogBox> {
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget.title),
+      backgroundColor: widget.dialogBackgroundColor,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -61,13 +70,24 @@ class _TwoInputDialogBoxState extends State<TwoInputDialogBox> {
       ),
       actions: [
         TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: widget.buttonColor,
+            // This sets the background color
+            foregroundColor: Colors.white, // This sets the text color
+          ),
           onPressed: () {
             final input1 = _controller1.text.trim();
             final input2 = _controller2.text.trim();
             widget.onSubmit(input1, input2);
             Navigator.of(context).pop();
           },
-          child: const Text('Submit'),
+          child: Text(
+            widget.buttonText,
+            style: TextStyle(
+              color: widget.buttonTextColor,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
         ),
       ],
     );

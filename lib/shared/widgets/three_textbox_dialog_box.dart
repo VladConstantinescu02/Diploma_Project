@@ -16,6 +16,10 @@ class ThreeTextBoxDialogBox extends StatefulWidget {
   final IconData icon2;
   final IconData icon3;
   final Function(String, String, String) onSubmit;
+  final Color buttonColor;
+  final String buttonText;
+  final Color buttonTextColor;
+  final Color dialogBackgroundColor;
 
   const ThreeTextBoxDialogBox({
     super.key,
@@ -27,6 +31,10 @@ class ThreeTextBoxDialogBox extends StatefulWidget {
     required this.icon2,
     required this.icon3,
     required this.onSubmit,
+    required this.buttonColor,
+    required this.buttonText,
+    required this.buttonTextColor,
+    required this.dialogBackgroundColor,
   });
 
   @override
@@ -75,6 +83,9 @@ class _ThreeTextBoxDialogBoxState extends State<ThreeTextBoxDialogBox> {
       ),
       actions: [
         TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: widget.buttonColor
+          ),
           onPressed: () {
             final input1 = _controller1.text.trim();
             final input2 = _controller2.text.trim();
@@ -82,7 +93,13 @@ class _ThreeTextBoxDialogBoxState extends State<ThreeTextBoxDialogBox> {
             widget.onSubmit(input1, input2, input3);
             Navigator.of(context).pop();
           },
-          child: const Text('Submit'),
+          child: Text(
+              widget.buttonText,
+            style: TextStyle(
+              color: widget.buttonTextColor,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
         ),
       ],
     );

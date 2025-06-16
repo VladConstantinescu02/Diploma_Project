@@ -9,6 +9,9 @@ class TemplateDialogBox extends StatelessWidget {
   final VoidCallback? onCancel;
   final Color textButtonColorCancel;
   final Color textButtonColorConfirm;
+  final Color buttonCancel;
+  final Color buttonConfirm;
+  final Color backgroundColor;
 
   const TemplateDialogBox({
     super.key,
@@ -20,11 +23,15 @@ class TemplateDialogBox extends StatelessWidget {
     this.onCancel,
     required this.textButtonColorCancel,
     required this.textButtonColorConfirm,
+    required this.backgroundColor,
+    required this.buttonCancel,
+    required this.buttonConfirm,
   });
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      backgroundColor: backgroundColor,
       title: Text(
         title,
         style: const TextStyle(fontWeight: FontWeight.bold),
@@ -32,6 +39,9 @@ class TemplateDialogBox extends StatelessWidget {
       content: Text(content),
       actions: [
         TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: buttonCancel,
+          ),
           onPressed: () {
             Navigator.pop(context);
             if (onCancel != null) onCancel!();
@@ -44,12 +54,15 @@ class TemplateDialogBox extends StatelessWidget {
           ),
         ),
         TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: buttonConfirm
+          ),
           onPressed: () {
             Navigator.pop(context);
             if (onConfirm != null) onConfirm!();
           },
           child: Text(
-              confirmText,
+            confirmText,
             style: TextStyle(
               color: textButtonColorConfirm,
             ),
