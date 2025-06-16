@@ -1,21 +1,20 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:diploma_prj/features/authentication/screens/login_screen.dart';
-import 'package:diploma_prj/shared/services/authentication_service.dart';
-import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../shared/widgets/text_box_widget.dart';
+import '../../../shared/services/authentication_service.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../shared/errors/authentication_service_error_handling.dart';
-
-
+// Colors (keep your design)
 const Color mainColor = Color(0xFFF27507);
 const Color secondaryColor = Color(0xFF3C4C59);
 const Color backGroundColor = Color(0xFFFAFAF9);
+const Color darkColor = Color(0xFF2B2B2B);
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -31,15 +30,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Uint8List? pickedImage;
 
+  // Pick profile image
   Future<void> pickProfileImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      final imageBytes = await image.readAsBytes();
-      setState(() => pickedImage = imageBytes);
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+      if (image != null) {
+        final imageBytes = await image.readAsBytes();
+        setState(() => pickedImage = imageBytes);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Image selection failed: ${e.toString()}")),
+      );
     }
   }
 
+  // Main register function
   Future<void> register() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -67,9 +74,16 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
       await user.updateDisplayName(username);
 
+      // 🔑 Ensure token is fully active for Firestore & Storage
+      await user.getIdToken(true);
+
       String? profilePhotoUrl;
+
       if (pickedImage != null) {
-        final imageRef = FirebaseStorage.instance.ref().child("users/${user.uid}/profile_picture.jpg");
+        final imageRef = FirebaseStorage.instance
+            .ref()
+            .child("users/${user.uid}/profile_picture.jpg");
+
         await imageRef.putData(pickedImage!);
         profilePhotoUrl = await imageRef.getDownloadURL();
       }
@@ -82,17 +96,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       });
 
       if (!mounted) return;
-      context.go('/home');
-
+      context.go('/login');
     } catch (e) {
       String errorMessage = 'Failed to register';
-
       if (e is FirebaseAuthException) {
-        errorMessage = getFirebaseAuthErrorMessage(e);
+        errorMessage = e.message ?? errorMessage;
       }
 
       if (!mounted) return;
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(errorMessage),
@@ -121,6 +132,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
               ),
 
+              const SizedBox(height: 25),
+
+              // Profile Image Picker
               GestureDetector(
                 onTap: pickProfileImage,
                 child: CircleAvatar(
@@ -135,7 +149,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
               const SizedBox(height: 25),
 
-              // Email
+              // Email Input
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: MyControllerTextbox(
@@ -148,7 +162,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
               ),
 
-              // Username
+              // Username Input
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: MyControllerTextbox(
@@ -161,7 +175,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
               ),
 
-              // Password
+              // Password Input
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: MyControllerTextbox(
@@ -174,7 +188,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
               ),
 
-              // Sign Up Button
+              // Register Button
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Container(
@@ -189,7 +203,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     borderRadius: BorderRadius.all(Radius.circular(48)),
                   ),
                   child: InkWell(
-                    onTap: register,  // 🔥 Only call register() directly
+                    onTap: register,
                     child: const Text(
                       "Sign up",
                       style: TextStyle(
@@ -204,25 +218,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
               const SizedBox(height: 18),
 
-              // Login Prompt
+              // Login Redirect
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    "Already have an account? ",
-                    style: TextStyle(fontSize: 16, color: secondaryColor),
-                  ),
+                  const Text("Already have an account? ", style: TextStyle(fontSize: 16, color: secondaryColor)),
                   InkWell(
-                    onTap: () {
-                      context.go('/login');
-                    },
-                    child: const Text(
-                      "Login",
-                      style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: mainColor),
-                    ),
+                    onTap: () => context.go('/login'),
+                    child: const Text("Login", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: mainColor)),
                   ),
                 ],
               ),
