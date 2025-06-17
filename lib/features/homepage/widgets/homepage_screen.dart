@@ -9,7 +9,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFAFAF9),
       appBar: AppBar(
+        backgroundColor: const Color(0xFFFAFAF9),
         title: const Text(
           'Lets get cooking!',
           style: TextStyle(
@@ -38,9 +40,9 @@ class HomeScreen extends StatelessWidget {
                   onTap: () {
                     GoRouter.of(context).go('/fridge');
                   },
-                  icon: const Icon(Icons.set_meal_rounded, color: Colors.white, size: 40),
+                  icon: const Icon(Icons.food_bank_rounded, color: Colors.white, size: 40),
                   text: 'Lets build your fridge',
-                  cardColor: const Color(0xFF8FB1BE),
+                  cardColor: const Color(0xFF3C4C59),
                   textColor: Colors.white,
                   iconColor: Colors.white,
                 ),
@@ -48,19 +50,19 @@ class HomeScreen extends StatelessWidget {
                   onTap: () {
                     GoRouter.of(context).go('/meals');
                   },
-                  icon: const Icon(Icons.fastfood, color: Colors.black, size: 40),
+                  icon: const Icon(Icons.set_meal, color: Color(0xFFFAFAF9), size: 40),
                   text: 'Create your meals',
-                  cardColor: const Color(0xFFEEE3AB),
-                  textColor: Colors.black,
-                  iconColor: Colors.black,
+                  cardColor: const  Color(0xFF61788C),
+                  textColor: const Color(0xFFFAFAF9),
+                  iconColor: const Color(0xFFFAFAF9),
                 ),
                 HomePageCard(
                   onTap: () {
                     GoRouter.of(context).go('/profile');
                   },
-                  icon: const Icon(Icons.account_circle, color: Colors.white, size: 40),
+                  icon: const Icon(Icons.person, color: Colors.white, size: 40),
                   text: 'Set up your profile',
-                  cardColor: const Color(0xFF561D25),
+                  cardColor: const Color(0xFFF27507),
                   textColor: Colors.white,
                   iconColor: Colors.white,
                 ),

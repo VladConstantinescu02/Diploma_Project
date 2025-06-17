@@ -87,7 +87,20 @@ class _FridgeScreenState extends ConsumerState<FridgeScreen> {
     final fridgeIngredients = fridgeStateAsync.value?.fridge?.fridgeIngredients;
     ingredients = fridgeIngredients?.map((fi) => SearchIngredient(fi.ingredientId, fi.name)).toList() ?? [];
     return Scaffold(
+      appBar: AppBar(
+        centerTitle: false,
+        elevation: 0,
+        backgroundColor: const Color(0xFFF2A20C),
+        foregroundColor: Colors.white,
+        title: const Text(
+            "Fridge",
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
       body: Container(
+        color: const Color(0xFFFAFAF9),
         child: fridgeIngredients != null && fridgeIngredients.isNotEmpty ?
         fridgeStateAsync.when(
           data: (fridgeState) => ListView.builder(
@@ -126,6 +139,8 @@ class _FridgeScreenState extends ConsumerState<FridgeScreen> {
             )
       ),
       floatingActionButton: FloatingActionButton(
+        elevation: 0,
+        backgroundColor:  const Color(0xFFF2A20C),
         onPressed: () async {
           await showModalBottomSheet(
           context: context,
@@ -137,7 +152,7 @@ class _FridgeScreenState extends ConsumerState<FridgeScreen> {
               }, ingredients)
           );
         },
-        child: const Icon(Icons.add),
+        child: const Icon(Icons.add, color: Color(0xFFFAFAF9),),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );

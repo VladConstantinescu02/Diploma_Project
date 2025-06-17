@@ -23,19 +23,36 @@ class FridgeIngredient extends ConsumerWidget {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
+              backgroundColor: const Color(0xFFFAFAF9),
               title: const Text('Confirm Delete'),
-              content: const Text('Are you sure you want to delete this ingredient?'),
+              content: const Text(
+                  'Are you sure you want to delete this ingredient?'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
                   child: const Text('Cancel'),
                 ),
-                TextButton(
-                  onPressed: () async {
-                    Navigator.of(context).pop(true);
-                    await ref.read(fridgeProvider.notifier).deleteFridgeIngredient(fridgeIngredient.ingredientId);
-                  },
-                  child: const Text('Delete'),
+                SizedBox(
+                  width: 100,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: const Color(0xFF8B1E3F),
+                    ),
+                    onPressed: () async {
+                      Navigator.of(context).pop(true);
+                      await ref
+                          .read(fridgeProvider.notifier)
+                          .deleteFridgeIngredient(
+                              fridgeIngredient.ingredientId);
+                    },
+                    child: const Text(
+                      'Delete',
+                      style: TextStyle(
+                        color: Color(0xFFFAFAF9),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             );
@@ -53,7 +70,7 @@ class FridgeIngredient extends ConsumerWidget {
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(48),
         ),
         elevation: 4,
         child: Padding(
@@ -62,11 +79,13 @@ class FridgeIngredient extends ConsumerWidget {
             children: [
               CircleAvatar(
                 radius: 28,
+                backgroundColor: const Color(0xFF61788C),
                 child: Text(
                   fridgeIngredient.name[0].toUpperCase(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
+                    color: Color(0xFFFAFAF9),
                   ),
                 ),
               ),
@@ -78,21 +97,23 @@ class FridgeIngredient extends ConsumerWidget {
                     Text(
                       fridgeIngredient.name,
                       style: const TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${fridgeIngredient.caloriesPer100Grams?.toStringAsFixed(1)} cal/100g',
-                      style: TextStyle(
-                        fontSize: 14,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        fontStyle: FontStyle.italic,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${fridgeIngredient.quantity} ${fridgeIngredient.ingredientMeasuringUnitSuffix}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 14,
                       ),
                     ),
@@ -102,10 +123,17 @@ class FridgeIngredient extends ConsumerWidget {
               PopupMenuButton<String>(
                 icon: const Icon(Icons.more_vert),
                 onSelected: (value) async {
-                  if (value == 'edit')  {
-                    showAdaptiveDialog(context: context, builder: (BuildContext context) {
-                      return UpdateFridgeIngredientForm(ingredientId: fridgeIngredient.ingredientId, ingredientName: fridgeIngredient.name, ingredientQuantity: fridgeIngredient.quantity, ingredientMeasuringUnitSuffix: fridgeIngredient.ingredientMeasuringUnitSuffix);
-                    });
+                  if (value == 'edit') {
+                    showAdaptiveDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return UpdateFridgeIngredientForm(
+                              ingredientId: fridgeIngredient.ingredientId,
+                              ingredientName: fridgeIngredient.name,
+                              ingredientQuantity: fridgeIngredient.quantity,
+                              ingredientMeasuringUnitSuffix: fridgeIngredient
+                                  .ingredientMeasuringUnitSuffix);
+                        });
                   }
                 },
                 itemBuilder: (BuildContext context) => [

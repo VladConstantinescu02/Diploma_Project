@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 
+import '../../../shared/widgets/template_obscured_input_field.dart';
+
 // Colors
 const Color mainColor = Color(0xFFF27507);
 const Color secondaryColor = Color(0xFF3C4C59);
 const Color backGroundColor = Color(0xFFFAFAF9);
 const Color darkColor = Color(0xFF2B2B2B);
 
-class TwoInputDialogBox extends StatefulWidget {
+class DeleteAccountDialogBox extends StatefulWidget {
   final String title;
   final String label1;
   final String label2;
@@ -19,7 +21,7 @@ class TwoInputDialogBox extends StatefulWidget {
   final Color buttonTextColor;
   final Color dialogBackgroundColor;
 
-  const TwoInputDialogBox({
+  const DeleteAccountDialogBox({
     super.key,
     required this.title,
     required this.label1,
@@ -34,10 +36,10 @@ class TwoInputDialogBox extends StatefulWidget {
   });
 
   @override
-  State<TwoInputDialogBox> createState() => _TwoInputDialogBoxState();
+  State<DeleteAccountDialogBox> createState() => _DeleteAccountDialogBoxState();
 }
 
-class _TwoInputDialogBoxState extends State<TwoInputDialogBox> {
+class _DeleteAccountDialogBoxState extends State<DeleteAccountDialogBox> {
   final TextEditingController _controller1 = TextEditingController();
   final TextEditingController _controller2 = TextEditingController();
 
@@ -58,13 +60,14 @@ class _TwoInputDialogBoxState extends State<TwoInputDialogBox> {
             textBoxStaticColor: secondaryColor,
           ),
           const SizedBox(height: 12),
-          TemplateControllerTextbox(
+          TemplateObscuredTextbox(
             textBoxController: _controller2,
             textBoxLabel: widget.label2,
             textBoxIcon: widget.icon2,
             textLabelColor: darkColor,
             textBoxFocusedColor: mainColor,
             textBoxStaticColor: secondaryColor,
+            isInput: true,
           ),
         ],
       ),

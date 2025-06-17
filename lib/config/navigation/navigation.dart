@@ -9,7 +9,7 @@ class Navigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: const Color(0xFFFF5733),
+      color: const Color(0xFFF2A20C),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
         child: GNav(
@@ -17,10 +17,10 @@ class Navigation extends StatelessWidget {
           onTabChange: (index) {
             navigationShell.goBranch(index);
           },
-          backgroundColor: const Color(0xFFFF5733),
+          backgroundColor: const Color(0xFFF2A20C),
           color: Colors.white,
           activeColor: Colors.white,
-          tabActiveBorder: Border.all(color: const Color(0xFFFAF3E0)),
+          tabActiveBorder: Border.all(color: const Color(0xFFFAFAF9)),
           padding: const EdgeInsets.all(12),
           gap: 10,
           tabs: const [
