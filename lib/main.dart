@@ -1,4 +1,3 @@
-import 'package:diploma_prj/shared/providers/theme_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'config/routing/router_configuration.dart';
@@ -21,12 +20,13 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
-    final theme = ref.watch(appThemeDataProvider);
 
     return MaterialApp.router(
       routerConfig: router,
       title: 'App',
-      theme: theme,
+      theme: ThemeData(
+        primaryColor: const Color(0xFFF27507),
+      ),
     );
   }
 }
