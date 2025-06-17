@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../../shared/errors/authentication_service_error_handling.dart';
+import '../../../shared/widgets/template_obscured_input_field.dart';
 
 // Replace with actual colors or use default Material colors
 const Color mainColor = Color(0xFFF27507);
@@ -54,7 +55,7 @@ class LoginScreen extends ConsumerWidget {
 
                   Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: MyControllerTextbox(
+                    child: TemplateControllerTextbox(
                       textBoxController: _emailController,
                       textBoxLabel: 'Email',
                       textBoxIcon: Icons.email_outlined,
@@ -66,13 +67,14 @@ class LoginScreen extends ConsumerWidget {
 
                   Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child: MyControllerTextbox(
+                    child:  TemplateObscuredTextbox(
                       textBoxController: _passwordController,
                       textBoxLabel: 'Password',
                       textBoxIcon: Icons.password_outlined,
                       textLabelColor: darkColor,
                       textBoxFocusedColor: mainColor,
                       textBoxStaticColor: secondaryColor,
+                      isInput: true,
                     ),
                   ),
 

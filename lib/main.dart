@@ -1,3 +1,4 @@
+import 'package:diploma_prj/shared/widgets/loading_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'config/routing/router_configuration.dart';
@@ -19,6 +20,16 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+
+    // Show loading screen while checking auth state
+    if (authState.isLoading) {
+      return const MaterialApp(
+        home: AuthLoadingScreen(),
+      );
+    }
+
+
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(

@@ -53,7 +53,7 @@ class _ThreeTextBoxDialogBoxState extends State<ThreeTextBoxDialogBox> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          MyControllerTextbox(
+          TemplateControllerTextbox(
             textBoxController: _controller1,
             textBoxLabel: widget.label1,
             textBoxIcon: widget.icon1,
@@ -62,7 +62,7 @@ class _ThreeTextBoxDialogBoxState extends State<ThreeTextBoxDialogBox> {
             textBoxStaticColor: secondaryColor,
           ),
           const SizedBox(height: 12),
-          MyControllerTextbox(
+          TemplateControllerTextbox(
             textBoxController: _controller2,
             textBoxLabel: widget.label2,
             textBoxIcon: widget.icon2,
@@ -71,7 +71,7 @@ class _ThreeTextBoxDialogBoxState extends State<ThreeTextBoxDialogBox> {
             textBoxStaticColor: secondaryColor,
           ),
           const SizedBox(height: 12),
-          MyControllerTextbox(
+          TemplateControllerTextbox(
             textBoxController: _controller3,
             textBoxLabel: widget.label3,
             textBoxIcon: widget.icon3,

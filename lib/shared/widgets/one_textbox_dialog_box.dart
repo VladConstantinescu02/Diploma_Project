@@ -40,7 +40,7 @@ class _OneTextBoxDialogBoxState extends State<OneTextBoxDialogBox> {
     return AlertDialog(
       title: Text(widget.title),
       backgroundColor: widget.dialogBackgroundColor,
-      content: MyControllerTextbox(
+      content: TemplateControllerTextbox(
         textBoxController: _controller,
         textBoxLabel: widget.label,
         textBoxIcon: widget.icon,

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class MyControllerTextbox extends StatelessWidget {
+class TemplateControllerTextbox extends StatelessWidget {
   final TextEditingController textBoxController;
   final String textBoxLabel;
   final IconData textBoxIcon;
@@ -9,7 +9,7 @@ class MyControllerTextbox extends StatelessWidget {
   final Color textBoxFocusedColor;
   final Color textBoxStaticColor;
 
-  const MyControllerTextbox(
+  const TemplateControllerTextbox(
       {super.key,
       required this.textBoxController,
       required this.textBoxLabel,

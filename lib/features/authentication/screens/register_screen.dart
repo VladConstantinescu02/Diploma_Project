@@ -152,7 +152,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               // Email Input
               Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: MyControllerTextbox(
+                child: TemplateControllerTextbox(
                   textBoxController: _emailController,
                   textBoxLabel: 'Your Email',
                   textBoxIcon: Icons.email_outlined,
@@ -165,7 +165,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               // Username Input
               Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: MyControllerTextbox(
+                child: TemplateControllerTextbox(
                   textBoxController: _usernameController,
                   textBoxLabel: 'Your username',
                   textBoxIcon: Icons.supervised_user_circle_outlined,
@@ -178,7 +178,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               // Password Input
               Padding(
                 padding: const EdgeInsets.all(12.0),
-                child: MyControllerTextbox(
+                child: TemplateControllerTextbox(
                   textBoxController: _passwordController,
                   textBoxLabel: 'Your password',
                   textBoxIcon: Icons.password_outlined,

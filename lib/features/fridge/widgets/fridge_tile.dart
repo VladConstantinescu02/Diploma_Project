@@ -7,9 +7,9 @@ class FridgeTile extends StatelessWidget {
   final double ingredientCalories;
   final double ingredientQty;
   final String ingredientQtySuffix;
-  Function(BuildContext)? deleteFridgeTile;
+  final Function(BuildContext)? deleteFridgeTile;
 
-  FridgeTile({
+  const FridgeTile({
     super.key,
     required this.ingredientID,
     required this.ingredientName,
@@ -25,21 +25,21 @@ class FridgeTile extends StatelessWidget {
       padding: const EdgeInsets.all(15.0),
       child: Slidable(
         endActionPane: ActionPane(
-            motion: const BehindMotion(),
-            children: [
-              SlidableAction(
-                  onPressed: deleteFridgeTile,
-                  icon: Icons.delete_sweep,
-                  backgroundColor: Colors.redAccent,
-                  borderRadius: BorderRadius.circular(12),
-              ),
-            ],
+          motion: const BehindMotion(),
+          children: [
+            SlidableAction(
+              onPressed: deleteFridgeTile,
+              icon: Icons.delete_sweep,
+              backgroundColor: const Color(0xFF8B1E3F),
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ],
         ),
         child: Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
             color: Colors.black87,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(48),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,15 +50,15 @@ class FridgeTile extends StatelessWidget {
                   Text(
                     ingredientName,
                     style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
+                      color: Colors.redAccent,
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   Text(
                     '${ingredientCalories.toStringAsFixed(0)} kcal',
                     style: const TextStyle(
-                      color: Colors.white70,
+                      color: Color(0xFFF27507),
                       fontSize: 14,
                     ),
                   ),
