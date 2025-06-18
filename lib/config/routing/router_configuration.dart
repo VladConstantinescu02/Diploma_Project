@@ -80,7 +80,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           StatefulShellBranch(routes: [
             GoRoute(
               path: '/meals',
-              builder: (context, state) => const MealsScreen(),
+              builder: (context, state) => const MealScreen(),
             ),
           ]),
           StatefulShellBranch(routes: [
