@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/meal_model.dart';
+import '../providers/saved_meal_provider.dart';
 
-class MealSelectionScreen extends StatefulWidget {
+class MealSelectionScreen extends ConsumerStatefulWidget {
   const MealSelectionScreen({super.key});
 
   @override
-  State<MealSelectionScreen> createState() => _MealSelectionScreenState();
+  ConsumerState<MealSelectionScreen> createState() => _MealSelectionScreenState();
 }
 
-class _MealSelectionScreenState extends State<MealSelectionScreen> {
+class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
   List<Meal> _meals = [];
   final bool _isLoading = false;
   String? _error;
@@ -77,8 +79,7 @@ class _MealSelectionScreenState extends State<MealSelectionScreen> {
                               borderRadius: BorderRadius.circular(48),
                               border:
                                   Border.all(color: const Color(0xFF3C4C59))),
-                          child:
-                          Column(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               Padding(
@@ -89,7 +90,8 @@ class _MealSelectionScreenState extends State<MealSelectionScreen> {
                                     Row(
                                       children: [
                                         ClipRRect(
-                                          borderRadius: BorderRadius.circular(48),
+                                          borderRadius:
+                                              BorderRadius.circular(48),
                                           child: Image.network(
                                             meal.image,
                                             width: 100,
@@ -110,7 +112,8 @@ class _MealSelectionScreenState extends State<MealSelectionScreen> {
                                                 meal.title,
                                                 style: const TextStyle(
                                                     fontSize: 16,
-                                                    fontWeight: FontWeight.w600),
+                                                    fontWeight:
+                                                        FontWeight.w600),
                                               ),
                                               if (meal.readyInMinutes != null)
                                                 Text(
@@ -118,16 +121,17 @@ class _MealSelectionScreenState extends State<MealSelectionScreen> {
                                               if (meal.nutrition != null)
                                                 Builder(
                                                   builder: (_) {
-                                                    final nutrients =
-                                                        meal.nutrition!['nutrients']
-                                                            as List?;
+                                                    final nutrients = meal
+                                                            .nutrition![
+                                                        'nutrients'] as List?;
                                                     final calories =
                                                         nutrients?.firstWhere(
-                                                            (n) =>
-                                                                n['name'] ==
-                                                                'Calories',
-                                                            orElse: () =>
-                                                                null)?['amount'];
+                                                                (n) =>
+                                                                    n['name'] ==
+                                                                    'Calories',
+                                                                orElse: () =>
+                                                                    null)?[
+                                                            'amount'];
                                                     return calories != null
                                                         ? Text(
                                                             'Calories: ${calories.toStringAsFixed(0)} kcal')
@@ -161,19 +165,65 @@ class _MealSelectionScreenState extends State<MealSelectionScreen> {
                                           ),
                                         ],
                                       ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color(0xFFF27507),
-                                        elevation: 0,
-                                      ),
-                                      onPressed: () {},
-                                      child: const Text(
-                                          "Save",
-                                        style: TextStyle(
-                                          color: Color(0xFFFAFAF9),
+                                    if (meal.sourceName != null &&
+                                        meal.sourceName!.isNotEmpty)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            const Text('Found originally at:',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w600,
+                                                ),
+                                            ),
+                                            Text(
+                                              meal.sourceName!,
+                                            ),
+                                          ],
                                         ),
                                       ),
-                                    ),
+                                      if (meal.sourceUrl != null && meal.sourceUrl!.isNotEmpty)
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 12),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              const Text('Find out more:',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              Text(
+                                                meal.sourceUrl!,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              const Color(0xFFF27507),
+                                          elevation: 0,
+                                        ),
+                                        onPressed: () {
+                                        final isSaved = ref.read(savedMealsProvider.notifier).isSaved(meal);
+
+                                        if (isSaved) {
+                                          ref.read(savedMealsProvider.notifier).removeMeal(meal);
+                                        } else {
+                                          ref.read(savedMealsProvider.notifier).saveMeal(meal);
+                                        }
+                                      },
+                                        child: const Text(
+                                          "Save",
+                                          style: TextStyle(
+                                            color: Color(0xFFFAFAF9),
+                                          ),
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),

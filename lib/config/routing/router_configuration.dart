@@ -9,7 +9,7 @@ import '../../features/authentication/screens/register_screen.dart';
 import '../../features/fridge/screens/fridge_screen.dart';
 import '../../features/homepage/screens/homepage.dart';
 import '../../features/meals/screens/meal_selection_screen.dart';
-import '../../shared/services/authentication_service.dart';
+import '../../features/authentication/models/authentication_service.dart';
 import '../navigation/navigation.dart';
 import '../../features/meals/screens/meals_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';

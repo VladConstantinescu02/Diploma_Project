@@ -11,9 +11,8 @@ class MealScreen extends StatefulWidget {
 
 class _MealScreenState extends State<MealScreen> {
 //  final MealAPIService _apiService = MealAPIService();
-  List<Meal> _meals = [];
   bool _isLoading = false;
-  String? _error;
+
 
   @override
   Widget build(BuildContext context) {
@@ -39,15 +38,6 @@ class _MealScreenState extends State<MealScreen> {
             context: context,
             builder: (_) => const FilerMeal(),
           );
-
-          if (filteredMeals != null) {
-            setState(() {
-              _meals = filteredMeals;
-              _error = null;
-            });
-          }
-
-          setState(() => _isLoading = false);
         },
         label: const Text(
           'Add meal',

@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../shared/widgets/text_box_widget.dart';
-import '../../../shared/services/authentication_service.dart';
+import '../models/authentication_service.dart';
 import 'package:go_router/go_router.dart';
 
 // Colors (keep your design)
