@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import '../../features/meals/models/meal_response.dart';
-
+import '../models/meal_response.dart';
 
 class MealAPIService {
   final String _apiKey = '1a39e08ed50746588fa1e4833137c6e3';
@@ -14,6 +13,7 @@ class MealAPIService {
     String? diet,
     String? intolerances,
     String? excludeIngredients,
+    String? information,
     int? minCalories,
     int? maxCalories,
     int? maxReadyTime,
@@ -26,14 +26,16 @@ class MealAPIService {
       if (diet != null) 'diet': diet,
       if (intolerances != null) 'intolerances': intolerances,
       if (excludeIngredients != null) 'excludeIngredients': excludeIngredients,
-      if (minCalories != null || maxCalories != null) 'addRecipeNutrition': 'true',
+      if (minCalories != null || maxCalories != null)
+        'addRecipeNutrition': 'true',
       if (minCalories != null) 'minCalories': '$minCalories',
       if (maxCalories != null) 'maxCalories': '$maxCalories',
       if (maxReadyTime != null) 'maxReadyTime': '$maxReadyTime',
       'addRecipeInformation': 'true',
     };
 
-    final uri = Uri.https('api.spoonacular.com', '/recipes/complexSearch', queryParameters);
+    final uri = Uri.https(
+        'api.spoonacular.com', '/recipes/complexSearch', queryParameters);
 
     try {
       final response = await http.get(uri);
@@ -47,8 +49,9 @@ class MealAPIService {
             final nutrition = meal.nutrition;
             if (nutrition == null) return false;
 
-            final calories = nutrition['nutrients']
-                ?.firstWhere((n) => n['name'] == 'Calories', orElse: () => null)?['amount'];
+            final calories = nutrition['nutrients']?.firstWhere(
+                (n) => n['name'] == 'Calories',
+                orElse: () => null)?['amount'];
 
             if (calories == null || calories is! num) return false;
 
@@ -67,6 +70,4 @@ class MealAPIService {
       return null;
     }
   }
-
-
 }

@@ -8,6 +8,7 @@ import '../../features/authentication/screens/login_screen.dart';
 import '../../features/authentication/screens/register_screen.dart';
 import '../../features/fridge/screens/fridge_screen.dart';
 import '../../features/homepage/screens/homepage.dart';
+import '../../features/meals/screens/meal_selection_screen.dart';
 import '../../shared/services/authentication_service.dart';
 import '../navigation/navigation.dart';
 import '../../features/meals/screens/meals_screen.dart';
@@ -56,6 +57,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/register',
         builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/meal_select_screen',
+        builder: (context, state) => const MealSelectionScreen(),
       ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
