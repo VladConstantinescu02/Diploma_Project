@@ -3,16 +3,18 @@ class Meal {
   final String title;
   final String image;
   final int? readyInMinutes;
-  final String? instructions;
+  final String? summary;
   final Map<String, dynamic>? nutrition;
+  String? instructions;
 
   Meal({
     required this.id,
     required this.title,
     required this.image,
     this.readyInMinutes,
-    this.instructions,
+    this.summary,
     this.nutrition,
+    this.instructions,
   });
 
   factory Meal.fromJson(Map<String, dynamic> json) {
@@ -21,8 +23,9 @@ class Meal {
       title: json['title'],
       image: json['image'],
       readyInMinutes: json['readyInMinutes'],
-      instructions: json['instructions'],
-      nutrition: json['nutrition'],
+      summary: json['summary'] ?? '',
+      nutrition: json['nutrition'] ,
+      instructions: json['instructions'] ?? '',
     );
   }
 }
