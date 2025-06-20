@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../shared/services/authentication_service.dart';
+import '../../authentication/models/authentication_service.dart';
 import '../../../shared/widgets/one_textbox_dialog_box.dart';
 import '../../../shared/errors/authentication_service_error_handling.dart';
 import '../../../shared/widgets/profile_picture.dart';

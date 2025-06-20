@@ -17,6 +17,7 @@ class MealAPIService {
     int? minCalories,
     int? maxCalories,
     int? maxReadyTime,
+    List? fetchedIngredients,
   }) async {
     final queryParameters = {
       'apiKey': _apiKey,

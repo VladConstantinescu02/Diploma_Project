@@ -1,4 +1,4 @@
-import 'package:diploma_prj/shared/services/authentication_service.dart';
+import 'package:diploma_prj/features/authentication/models/authentication_service.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';

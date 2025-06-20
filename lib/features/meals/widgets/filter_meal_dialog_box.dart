@@ -3,8 +3,9 @@ import 'package:diploma_prj/shared/widgets/slider_template.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../services/get_meal_api_instructions_service.dart';
-import '../services/get_meal_api_service.dart';
+import '../services/get_meal_api_instructions_service_api.dart';
+import '../services/get_meal_api_service_api.dart';
+import '../services/get_meal_find_by_ingredients_api.dart';
 
 const Color mainColor = Color(0xFFF27507);
 const Color secondaryColor = Color(0xFF3C4C59);
@@ -87,10 +88,19 @@ class FilterMealState extends State<FilerMeal> {
         return !keywords.any((word) => title.contains(word));
       }).toList();
 
+      final service = GetMealByIngredient();
+
       for (final meal in filtered) {
         final instructions = await instructionService.getInstructions(meal.id);
         meal.instructions = instructions ?? 'No instructions available.';
+
+        final ingredientsData = await service.getByIngredients("bun,ketchup,ground meat");
+
+        meal.ingredients = ingredientsData ?? [];
+
+
       }
+
 
       if (filtered.isEmpty) {
         throw Exception("No meals found (alcohol is filtered).");
