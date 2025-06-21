@@ -1,8 +1,8 @@
 import 'package:diploma_prj/features/profile/services/delete_user_service.dart';
+import 'package:diploma_prj/features/profile/services/update_username_service.dart';
 import 'package:diploma_prj/features/profile/widgets/delete_account_dialog_box.dart';
 import 'package:diploma_prj/features/profile/widgets/info_display_widget.dart';
 import 'package:diploma_prj/shared/widgets/alert_dialog_box.dart';
-import 'package:diploma_prj/shared/widgets/three_textbox_dialog_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -14,16 +14,32 @@ import '../../../shared/widgets/one_textbox_dialog_box.dart';
 import '../../../shared/errors/authentication_service_error_handling.dart';
 import '../../../shared/widgets/profile_picture.dart';
 
+const Color mainColor = Color(0xFFF27507);
+const Color secondaryColor = Color(0xFF3C4C59);
+const Color backGroundColor = Color(0xFFFAFAF9);
+const Color darkColor = Color(0xFF2B2B2B);
+
+// This fetches the username on initialization (from Firebase)
+final usernameOnInitProvider = Provider<String>((ref) {
+  final user = FirebaseAuth.instance.currentUser;
+  return user?.displayName ?? 'Default Username';
+});
+
+// This will be the updatable username state
+final usernameProvider = StateProvider<String>((ref) {
+  return ref.watch(usernameOnInitProvider);
+});
+
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
-
-  get pickProfileImage => null;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final authService = ref.watch(authServiceProvider);
-    final username = authService.username ?? 'there!';
+
     final email = authService.email ?? 'you@mail.com';
+    // Watch the username state
+    final username = ref.watch(usernameProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -47,7 +63,7 @@ class ProfileScreen extends ConsumerWidget {
                 showDialog(
                   context: context,
                   builder: (context) => TemplateDialogBox(
-                    title: 'You are about to log out!',
+                    title: 'You are about to logout!',
                     content: 'Are you sure?',
                     confirmText: 'Yup!',
                     cancelText: 'Stay logged in',
@@ -108,7 +124,6 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     Text(
                       username,
-                      // Replace with actual username variable if needed
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w600,
@@ -152,70 +167,47 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     onPressed: () {
                       showDialog(
-                        context: context,
-                        builder: (context) => ThreeTextBoxDialogBox(
-                          title: 'Update your password',
-                          label1: 'Email',
-                          label2: 'Old password',
-                          label3: 'New password',
-                          icon1: Icons.email_outlined,
-                          icon2: Icons.password_outlined,
-                          icon3: Icons.edit,
-                          buttonColor: const Color(0xFFF27507),
-                          buttonTextColor: const Color(0xFFFAFAF9),
-                          buttonText: 'Confirm',
-                          dialogBackgroundColor: const Color(0xFFFAFAF9),
-                          onSubmit:
-                              (currentPassword, newPassword, email) async {
-                            try {
-                              await authService
-                                  .resetPasswordFromCurrentPassword(
-                                currentPassword: currentPassword,
-                                newPassword: newPassword,
-                                email: email,
-                              );
+                          context: context,
+                          builder: (context) => OneTextBoxDialogBox(
+                                title: 'Change you user name',
+                                label: 'Enter your username',
+                                icon: Icons.person_add_alt_1_outlined,
+                                onSubmit: (newUsername) async {
+                                  try {
+                                    final updateUserName =
+                                        ref.read(updateUserNameService);
+                                    await updateUserName
+                                        .updateUsername(newUsername);
+                                    ref.read(usernameProvider.notifier).state =
+                                        newUsername;
+                                  } on FirebaseAuthException catch (e) {
+                                    if (!context.mounted) return;
 
-                              if (!context.mounted) return;
+                                    String errorMessage =
+                                    getFirebaseAuthErrorMessage(e);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content: Text(errorMessage),
+                                          backgroundColor: const Color(0xFF8B1E3F)),
+                                    );
+                                  } catch (e) {
+                                    if (!context.mounted) return;
 
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content:
-                                      Text("Password updated successfully!"),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                            } on Exception catch (e) {
-                              if (!context.mounted) return;
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                      "Failed to update password: ${e.toString()}"),
-                                  backgroundColor: const Color(0xFF8B1E3F),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          content:
+                                          Text("An unexpected error occurred."),
+                                          backgroundColor: Color(0xFF8B1E3F),
+                                        ),
+                                    );
+                                  }
+                                },
+                                buttonColor: mainColor,
+                                buttonText: 'Summit',
+                                buttonTextColor: backGroundColor,
+                                dialogBackgroundColor: backGroundColor,
+                              ));
                     },
-                    child: const Text("Update password"),
-                  ),
-                ),
-                const Spacer(
-                  flex: 1,
-                ),
-                SizedBox(
-                  width: 180,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: const Color(0xFFF2A20C),
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 48),
-                      shape: const StadiumBorder(),
-                    ),
-                    onPressed: () {},
                     child: const Text("Edit Username"),
                   ),
                 ),
