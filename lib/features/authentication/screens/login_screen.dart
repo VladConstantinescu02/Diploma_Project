@@ -1,4 +1,5 @@
 import 'package:diploma_prj/features/authentication/models/authentication_service.dart';
+import 'package:diploma_prj/shared/widgets/one_textbox_dialog_box.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -22,8 +23,11 @@ class LoginScreen extends ConsumerWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final authService = ref.watch(authServiceProvider);
+
     return Scaffold(
       backgroundColor: backGroundColor,
       body: SafeArea(
@@ -39,13 +43,16 @@ class LoginScreen extends ConsumerWidget {
                     child: SizedBox(
                       height: 200,
                       width: 200,
-                      child: Lottie.asset('lib/utils/images/login_screen_animation.json'),
+                      child: Lottie.asset(
+                          'lib/utils/images/login_screen_animation.json'),
                     ),
                   ),
                   const Text(
                     "Hi there!",
                     style: TextStyle(
-                        color: mainColor, fontSize: 30, fontWeight: FontWeight.w900),
+                        color: mainColor,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w900),
                   ),
                   const Text(
                     "Welcome to Dishify!",
@@ -67,7 +74,7 @@ class LoginScreen extends ConsumerWidget {
 
                   Padding(
                     padding: const EdgeInsets.all(12.0),
-                    child:  TemplateObscuredTextbox(
+                    child: TemplateObscuredTextbox(
                       textBoxController: _passwordController,
                       textBoxLabel: 'Password',
                       textBoxIcon: Icons.password_outlined,
@@ -81,7 +88,10 @@ class LoginScreen extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Container(
-                      width: MediaQuery.of(context).size.width,
+                      width: MediaQuery
+                          .of(context)
+                          .size
+                          .width,
                       margin: kIsWeb
                           ? const EdgeInsets.symmetric(horizontal: 350)
                           : const EdgeInsets.symmetric(horizontal: 25),
@@ -98,7 +108,8 @@ class LoginScreen extends ConsumerWidget {
                           final authService = ref.read(authServiceProvider);
 
                           try {
-                            await authService.signIn(email: email, password: password);
+                            await authService.signIn(
+                                email: email, password: password);
 
                             if (!context.mounted) return;
                             context.go('/home');
@@ -143,11 +154,74 @@ class LoginScreen extends ConsumerWidget {
                         child: const Text(
                           "Register Now!",
                           style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w600, color: mainColor),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: mainColor),
                         ),
                       ),
                     ],
                   ),
+                  const SizedBox(height: 18),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "Forgot password? ",
+                        style: TextStyle(fontSize: 16, color: secondaryColor),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  OneTextBoxDialogBox(
+                                      title: "No problem!",
+                                      label: "Enter your email",
+                                      icon: Icons.email_outlined,
+                                      buttonColor: mainColor,
+                                      buttonText: "Submit",
+                                      buttonTextColor: secondaryColor,
+                                      dialogBackgroundColor: backGroundColor,
+                                      onSubmit: (email) async {
+                                        try {
+                                          await authService.resetPassword(email: email);
+
+                                          if (context.mounted) {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(
+                                                  content: Text("Check your email"),
+                                                  backgroundColor: Color(0xFF8B1E3F)),
+                                            );
+                                          }
+                                        } on FirebaseAuthException catch (e) {
+                                          String errorMessage =
+                                          getFirebaseAuthErrorMessage(e);
+                                          if (!context.mounted) return;
+
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(
+                                                content: Text(errorMessage),
+                                                backgroundColor: const Color(0xFF8B1E3F)),
+                                          );
+                                        }
+                                      },
+                                  ),
+                          );
+                        },
+                        child: const Text(
+                          "Reset it here!",
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: mainColor,
+                              decoration: TextDecoration.underline,
+                              decorationColor: mainColor),
+                        ),
+                      ),
+                    ],
+                  ),
+
                 ],
               ),
             ),
