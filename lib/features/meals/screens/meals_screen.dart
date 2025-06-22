@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../models/meal_model.dart';
 import '../widgets/filter_meal_dialog_box.dart';
 
@@ -11,8 +12,9 @@ class MealScreen extends StatefulWidget {
 
 class _MealScreenState extends State<MealScreen> {
 //  final MealAPIService _apiService = MealAPIService();
+  List<Meal> _meals = [];
   bool _isLoading = false;
-
+  String? _error;
 
   @override
   Widget build(BuildContext context) {
@@ -32,12 +34,15 @@ class _MealScreenState extends State<MealScreen> {
         backgroundColor: const Color(0xFFF27507),
         shape: const StadiumBorder(side: BorderSide(color: Colors.transparent)),
         onPressed: () async {
-          setState(() => _isLoading = true);
-
-          final List<Meal>? filteredMeals = await showDialog<List<Meal>>(
+          final filteredMeals = await showDialog<List<Meal>>(
             context: context,
-            builder: (_) => const FilerMeal(),
+            builder: (context) => const FilterMeal(),
           );
+
+          if (filteredMeals != null && context.mounted) {
+            // Navigate and pass meals to the selection screen
+            context.go('/meal_select_screen', extra: filteredMeals);
+          }
         },
         label: const Text(
           'Add meal',

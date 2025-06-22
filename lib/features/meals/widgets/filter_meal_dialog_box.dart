@@ -2,6 +2,7 @@ import 'package:diploma_prj/features/meals/widgets/to_int_slider.dart';
 import 'package:diploma_prj/shared/widgets/slider_template.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../services/get_meal_api_instructions_service_api.dart';
 import '../services/get_meal_api_service_api.dart';
@@ -12,14 +13,14 @@ const Color secondaryColor = Color(0xFF3C4C59);
 const Color backGroundColor = Color(0xFFFAFAF9);
 const Color darkColor = Color(0xFF2B2B2B);
 
-class FilerMeal extends StatefulWidget {
-  const FilerMeal({super.key});
+class FilterMeal extends StatefulWidget {
+  const FilterMeal({super.key});
 
   @override
   FilterMealState createState() => FilterMealState();
 }
 
-class FilterMealState extends State<FilerMeal> {
+class FilterMealState extends State<FilterMeal> {
   final PageController _pageController = PageController();
   final TextEditingController _controllerCuisine = TextEditingController();
   final TextEditingController _controllerDiet = TextEditingController();
@@ -108,7 +109,7 @@ class FilterMealState extends State<FilerMeal> {
 
       if (!mounted) return;
 
-      context.go('/meal_select_screen', extra: filtered);
+      Navigator.of(context).pop(filtered);
     } catch (e) {
       if (!mounted) {
         ScaffoldMessenger.of(context)
@@ -130,25 +131,13 @@ class FilterMealState extends State<FilerMeal> {
         width: 300,
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Text(
-                "Lets find a meal!",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: mainColor,
-                  fontSize: 30,
-                ),
-              ),
-            ),
-            // Progress Indicator
             Padding(
-              padding: const EdgeInsets.all(10.0),
+              padding: const EdgeInsets.all(20.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: List.generate(
                   2,
-                  (index) => AnimatedContainer(
+                      (index) => AnimatedContainer(
                     duration: const Duration(milliseconds: 300),
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     height: 60,
@@ -167,6 +156,18 @@ class FilterMealState extends State<FilerMeal> {
                 ),
               ),
             ),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12),
+              child: Text(
+                "Lets find a meal!",
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: mainColor,
+                  fontSize: 20,
+                ),
+              ),
+            ),
+            // Progress Indicator
             Expanded(
               child: PageView(
                 controller: _pageController,

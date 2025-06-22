@@ -21,14 +21,12 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final meals = GoRouterState.of(context).extra as List<Meal>?;
-
-    if (meals != null) {
-      setState(() {
-        _meals = meals;
-      });
+    final extra = GoRouterState.of(context).extra;
+    if (extra is List<Meal>) {
+      setState(() => _meals = extra);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
