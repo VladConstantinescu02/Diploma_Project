@@ -22,10 +22,10 @@ class ShowIntSlider extends StatefulWidget {
   });
 
   @override
-  _ShowIntSliderState createState() => _ShowIntSliderState();
+  ShowIntSliderState createState() => ShowIntSliderState();
 }
 
-class _ShowIntSliderState extends State<ShowIntSlider> {
+class ShowIntSliderState extends State<ShowIntSlider> {
   late double _currentValue;
 
   @override

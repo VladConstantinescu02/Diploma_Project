@@ -8,55 +8,32 @@ class Meal {
   String? instructions;
   String? sourceName;
   String? sourceUrl;
+  String? mealType;
+  String? cuisine;
+  final String? mealId;
   List<dynamic>? ingredients;
-
-  bool isSaved;
 
   Meal({
     required this.id,
     required this.title,
     required this.image,
     this.readyInMinutes,
-    this.ingredients,
     this.summary,
     this.nutrition,
     this.instructions,
     this.sourceName,
     this.sourceUrl,
-    this.isSaved = false,
+    this.ingredients,
+    this.cuisine,
+    this.mealType,
+    this.mealId,
   });
-
-
-  Meal copyWith({
-    int? id,
-    String? title,
-    String? image,
-    int? readyInMinutes,
-    String? summary,
-    Map<String, dynamic>? nutrition,
-    String? instructions,
-    List<dynamic>? ingredients,
-    bool? isSaved,
-  }) {
-    return Meal(
-      id: id ?? this.id,
-      title: title ?? this.title,
-      image: image ?? this.image,
-      readyInMinutes: readyInMinutes ?? this.readyInMinutes,
-      summary: summary ?? this.summary,
-      nutrition: nutrition ?? this.nutrition,
-      instructions: instructions ?? this.instructions,
-      ingredients: ingredients ?? this.ingredients,
-      isSaved: isSaved ?? this.isSaved, // ← add this if using a flag
-    );
-  }
-
 
   factory Meal.fromJson(Map<String, dynamic> json) {
     return Meal(
       id: json['id'],
-      title: json['title'],
-      image: json['image'],
+      title: json['title'] ?? '',
+      image: json['image'] ?? '',
       readyInMinutes: json['readyInMinutes'],
       summary: json['summary'] ?? '',
       nutrition: json['nutrition'],
@@ -64,7 +41,32 @@ class Meal {
       ingredients: json['ingredients'] ?? [],
       sourceName: json['sourceName'] ?? '',
       sourceUrl: json['sourceUrl'] ?? '',
-      isSaved: false,
+      cuisine: json['cuisine'] ?? '',
+      mealType: json['type'] ?? '',
+      mealId: json['mealId'] ?? '',
+    );
+  }
+
+  factory Meal.fromFirestore(Map<String, dynamic> json) {
+    return Meal(
+      id: int.tryParse(json['spoonacularID'] ?? '') ?? 0,
+      title: json['name'] ?? '',
+      image: json['imageURL'] ?? '',
+      readyInMinutes: json['readyInMinutes'],
+      summary: json['summary'] ?? '',
+      nutrition: {
+        'nutrients': [
+          {
+            'name': 'Calories',
+            'amount': json['calories'] ?? 0,
+          }
+        ]
+      },
+      instructions: json['instructions'] ?? '',
+      sourceUrl: json['sourceUrl'] ?? '',
+      cuisine: json['cuisine'] ?? '',
+      mealType: json['type'] ?? '',
+      mealId: json['mealId'] ?? '',
     );
   }
 }
