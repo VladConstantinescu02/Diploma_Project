@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../models/meal_model.dart';
-import '../providers/saved_meal_provider.dart';
+import '../services/FireStore/save_meals_to_firestore_service.dart';
+
 
 class MealSelectionScreen extends ConsumerStatefulWidget {
   const MealSelectionScreen({super.key});
@@ -208,17 +210,36 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
                                               const Color(0xFFF27507),
                                           elevation: 0,
                                         ),
-                                        onPressed: () {
-                                        final isSaved = ref.read(savedMealsProvider.notifier).isSaved(meal);
+                                        onPressed: () async {
+                                          try {
+                                            final userID = FirebaseAuth.instance.currentUser?.uid;
 
-                                        if (isSaved) {
-                                          ref.read(savedMealsProvider.notifier).removeMeal(meal);
-                                        } else {
-                                          ref.read(savedMealsProvider.notifier).saveMeal(meal);
-                                        }
-                                      },
+                                            if (userID == null) {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text("User not logged in."),
+                                                  backgroundColor: Color(0xFF8B1E3F),
+                                                ),
+                                              );
+                                              return;
+                                            }
+
+                                            // This assumes you have a Provider<SaveToFirestoreMealsService>
+                                            final saveMealService = ref.read(saveToFirestoreMealsServiceProvider);
+
+                                            await saveMealService.addMealToFireStore(meal: meal, userID: userID);
+                                          } catch (e) {
+                                            if (!context.mounted) return;
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text("An unexpected error occurred: $e"),
+                                                backgroundColor: const Color(0xFF8B1E3F),
+                                              ),
+                                            );
+                                          }
+                                        },
                                         child: const Text(
-                                          "Save",
+                                          "Save to account",
                                           style: TextStyle(
                                             color: Color(0xFFFAFAF9),
                                           ),

@@ -51,6 +51,7 @@ dependencies:
   http: ^1.4.0
   webview_flutter: ^4.10.0
   flash: ^3.1.0
+  uuid: ^3.0.7
 
 
 dev_dependencies:

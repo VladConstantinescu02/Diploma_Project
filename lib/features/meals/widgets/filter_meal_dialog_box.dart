@@ -3,9 +3,10 @@ import 'package:diploma_prj/shared/widgets/slider_template.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../services/get_meal_api_instructions_service_api.dart';
-import '../services/get_meal_api_service_api.dart';
-import '../services/get_meal_find_by_ingredients_api.dart';
+import '../services/API/get_meal_api_instructions_service_api.dart';
+import '../services/API/get_meal_api_service_api.dart';
+import '../services/API/get_meal_find_by_ingredients_api.dart';
+
 
 const Color mainColor = Color(0xFFF27507);
 const Color secondaryColor = Color(0xFF3C4C59);
@@ -62,8 +63,8 @@ class FilterMealState extends State<FilerMeal> {
       excludeAlcoholIngredients
     ].where((e) => e.isNotEmpty).join(',');
 
-    // Use these to call your API
     final mealService = MealAPIService();
+    const defaultIngredients = "tomato";
 
     try {
       final results = await mealService.getMeal(
@@ -71,51 +72,51 @@ class FilterMealState extends State<FilerMeal> {
         cuisine: cuisine.isEmpty ? null : cuisine,
         diet: diet.isEmpty ? null : diet,
         intolerances: intolerance.isEmpty ? null : intolerance,
-        excludeIngredients:
-            excludeIngredients.isEmpty ? null : excludeIngredients,
+        excludeIngredients: excludeIngredients.isEmpty ? null : excludeIngredients,
         minCalories: _minCalories.toInt(),
         maxCalories: _maxCalories.toInt(),
+        ingredients: defaultIngredients,
       );
-
       if (results == null) {
         throw Exception("No meals found.");
       }
 
       final instructionService = GetMealApiInstructionsService();
+      final ingredientService = GetMealByIngredient();
 
       final filtered = results.results.where((meal) {
         final title = meal.title.toLowerCase();
         return !keywords.any((word) => title.contains(word));
       }).toList();
 
-      final service = GetMealByIngredient();
-
-      for (final meal in filtered) {
-        final instructions = await instructionService.getInstructions(meal.id);
-        meal.instructions = instructions ?? 'No instructions available.';
-
-        final ingredientsData = await service.getByIngredients("bun,ketchup,ground meat");
-
-        meal.ingredients = ingredientsData ?? [];
-
-
-      }
-
-
       if (filtered.isEmpty) {
         throw Exception("No meals found (alcohol is filtered).");
       }
 
+      // Parallel async loading of meal details
+      final updatedMeals = await Future.wait(filtered.map((meal) async {
+        final instructions = await instructionService.getInstructions(meal.id);
+        final ingredients =
+        await ingredientService.getByIngredients("bun,ketchup,ground meat");
+
+        meal.instructions = instructions ?? 'No instructions available.';
+        meal.ingredients = ingredients ?? [];
+
+        return meal;
+      }));
+
       if (!mounted) return;
 
-      context.go('/meal_select_screen', extra: filtered);
+      context.go('/meal_select_screen', extra: updatedMeals);
     } catch (e) {
-      if (!mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.toString())));
-      }
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

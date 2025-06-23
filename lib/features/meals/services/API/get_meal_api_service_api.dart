@@ -1,10 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-import '../models/meal_response.dart';
+import '../../models/meal_response.dart';
 
 class MealAPIService {
-  final String _apiKey = '1a39e08ed50746588fa1e4833137c6e3';
+  final String _apiKey = 'bc0dd98ec2d8401291e11033be45a64a';
 
   Future<MealResponse?> getMeal({
     int? number,
@@ -18,6 +18,7 @@ class MealAPIService {
     int? maxCalories,
     int? maxReadyTime,
     List? fetchedIngredients,
+    String? ingredients,
   }) async {
     final queryParameters = {
       'apiKey': _apiKey,
@@ -32,6 +33,8 @@ class MealAPIService {
       if (minCalories != null) 'minCalories': '$minCalories',
       if (maxCalories != null) 'maxCalories': '$maxCalories',
       if (maxReadyTime != null) 'maxReadyTime': '$maxReadyTime',
+      if (ingredients != null && ingredients.isNotEmpty) // <-- Add this
+        'includeIngredients': ingredients,
       'addRecipeInformation': 'true',
     };
 

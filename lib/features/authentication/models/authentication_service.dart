@@ -1,5 +1,5 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 // Using Riverpod for state management, since it is necessary in order to call inside the application
 final authServiceProvider = Provider<AuthenticationService>((ref) {

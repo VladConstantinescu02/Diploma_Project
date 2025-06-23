@@ -23,18 +23,14 @@ class HomeScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0),
-            child: Lottie.asset(
+          Lottie.asset(
               'lib/utils/images/initial_home_animation.json',
-              width: 300,
-              height: 300,
+              width: 400,
+              height: 400,
             ),
-          ),
-
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(vertical: 10),
+              padding: const EdgeInsets.symmetric(vertical: 3),
               children: <Widget>[
                 HomePageCard(
                   onTap: () {
