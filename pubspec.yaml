@@ -52,6 +52,8 @@ dependencies:
   webview_flutter: ^4.10.0
   flash: ^3.1.0
   uuid: ^3.0.7
+  pdf: ^3.11.3
+  open_file: ^3.5.10
 
 
 dev_dependencies:

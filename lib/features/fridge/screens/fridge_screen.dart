@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
 import '../../../shared/models/search_ingredient.dart';
 import '../../../shared/widgets/search_ingredients.dart';
 import '../models/get_fridge_ingredient.dart';
@@ -126,14 +127,18 @@ class _FridgeScreenState extends ConsumerState<FridgeScreen> {
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
         ) :
-            const Center(
+            Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Icon(Icons.not_interested, size: 100,),
-                  Text('No fridge ingredients', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),),
-                  Text('Use the button below to add some', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),)
+                  Lottie.asset(
+                    'lib/utils/images/frideg_screen_animation.json',
+                    width: 300,
+                    height: 300,
+                  ),
+                  const Text('No fridge ingredients', style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),),
+                  const Text('Use the button below to add some', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w400),)
                 ]
               ),
             )
