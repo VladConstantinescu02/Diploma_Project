@@ -24,11 +24,8 @@ class DeleteUserSpecificMealFromFireStore {
           .limit(1)
           .get();
 
-      print('Found ${query.docs.length} matching meals');
-
       if (query.docs.isNotEmpty) {
-        await query.docs.first.reference.delete(); // ✅ Correct deletion
-        print("Meal successfully deleted!");
+        await query.docs.first.reference.delete();
       } else {
         print("No matching meal found.");
       }
