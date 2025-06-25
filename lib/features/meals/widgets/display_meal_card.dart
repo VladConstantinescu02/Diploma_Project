@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 import '../models/meal_model.dart';
+import '../services/FireStore/download_meal_from_firestore.dart';
 import 'meal_info_drawer.dart';
 
 const Color thirdColor = Color(0xFFF27507);
@@ -29,6 +30,31 @@ class DisplayMealCard extends ConsumerWidget {
         endActionPane: ActionPane(
           motion: const BehindMotion(),
           children: [
+            SlidableAction(
+              onPressed: (_) async {
+                final downloadService = ref.read(downloadMealToDeviceProvider);
+                try {
+                  await downloadService.generatePdf(meal);
+                } catch (e) {
+                  if(!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Failed to download PDF: $e'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
+              icon: Icons.save,
+              backgroundColor: const Color(0xFF3C4C59),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(48),
+                bottomRight: Radius.zero,
+                // Leave other corners square
+                topRight: Radius.zero,
+                bottomLeft: Radius.circular(48),
+              ),
+            ),
             SlidableAction(
               onPressed: (_) async {
                 try {
@@ -70,7 +96,13 @@ class DisplayMealCard extends ConsumerWidget {
               },
               icon: Icons.delete_sweep,
               backgroundColor: const Color(0xFF8B1E3F),
-              borderRadius: BorderRadius.circular(48),
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.zero,
+                bottomRight: Radius.circular(48),
+                // Leave other corners square
+                topRight: Radius.circular(48),
+                bottomLeft: Radius.zero
+              ),
             ),
           ],
         ),
