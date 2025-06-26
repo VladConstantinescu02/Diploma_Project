@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class IngredientInfoService {
-  final String _apiKey = 'bc0dd98ec2d8401291e11033be45a64a';
+  final String _apiKey = '1a39e08ed50746588fa1e4833137c6e3';
 
   Future<List<String>> fetchPossibleUnits(int ingredientId) async {
     final uri = Uri.https(
