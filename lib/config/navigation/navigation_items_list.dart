@@ -1,5 +1,6 @@
  import 'package:flutter/material.dart';
- import '../../models/navigation_item_prototype.dart';
+import '../models/navigation_item_prototype.dart';
+
 
 // list of navigation parameters
 final List<NavigationItem> navigationItems = [

@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class TemplateTextBoxWithFlag extends StatefulWidget {
@@ -38,27 +39,33 @@ class _TemplateTextBoxWithFlagState extends State<TemplateTextBoxWithFlag> {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      controller: widget.textBoxController, // Use the provided controller
-      decoration: InputDecoration(
-        labelText: widget.textBoxLabel,
-        labelStyle: TextStyle(
-          color: widget.textLabelColor,
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
+    return Container(
+      width: MediaQuery.of(context).size.width,
+      margin: kIsWeb
+          ? const EdgeInsets.symmetric(horizontal: 350)
+          : const EdgeInsets.symmetric(horizontal: 25),
+      child: TextField(
+        controller: widget.textBoxController, // Use the provided controller
+        decoration: InputDecoration(
+          labelText: widget.textBoxLabel,
+          labelStyle: TextStyle(
+            color: widget.textLabelColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+          prefixIcon: Icon(widget.textBoxIcon),
+          errorText: _errorText, // Display the validation error
+          border: OutlineInputBorder(
+            borderSide: BorderSide(color: widget.textBoxStaticColor, width: 2.0),
+            borderRadius: BorderRadius.circular(48.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: widget.textBoxFocusedColor, width: 2.0),
+            borderRadius: BorderRadius.circular(48.0),
+          ),
         ),
-        prefixIcon: Icon(widget.textBoxIcon),
-        errorText: _errorText, // Display the validation error
-        border: OutlineInputBorder(
-          borderSide: BorderSide(color: widget.textBoxStaticColor, width: 2.0),
-          borderRadius: BorderRadius.circular(48.0),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: widget.textBoxFocusedColor, width: 2.0),
-          borderRadius: BorderRadius.circular(48.0),
-        ),
+        onChanged: (text) => _validate(), // Trigger validation on text change
       ),
-      onChanged: (text) => _validate(), // Trigger validation on text change
     );
   }
 }

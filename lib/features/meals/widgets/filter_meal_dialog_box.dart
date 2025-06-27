@@ -1,103 +1,91 @@
 import 'package:diploma_prj/features/meals/widgets/to_int_slider.dart';
 import 'package:diploma_prj/shared/widgets/slider_template.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lottie/lottie.dart';
+import '../../../shared/widgets/template_text_box_with_flag.dart';
+import '../../fridge/providers/get_user_ingredient_list_from_firebase.dart';
 import '../services/API/get_meal_api_instructions_service_api.dart';
 import '../services/API/get_meal_api_service_api.dart';
 import '../services/API/get_meal_find_by_ingredients_api.dart';
-
 
 const Color mainColor = Color(0xFFF27507);
 const Color secondaryColor = Color(0xFF3C4C59);
 const Color backGroundColor = Color(0xFFFAFAF9);
 const Color darkColor = Color(0xFF2B2B2B);
 
-class FilerMeal extends StatefulWidget {
+class FilerMeal extends ConsumerStatefulWidget {
   const FilerMeal({super.key});
 
   @override
   FilterMealState createState() => FilterMealState();
 }
 
-class FilterMealState extends State<FilerMeal> {
-  final PageController _pageController = PageController();
-  final TextEditingController _controllerCuisine = TextEditingController();
-  final TextEditingController _controllerDiet = TextEditingController();
-  final TextEditingController _controllerExclude = TextEditingController();
-  final TextEditingController _controllerAllergy = TextEditingController();
-  final TextEditingController _dishType = TextEditingController();
-  double _minCalories = 500.0;
-  double _maxCalories = 1500.0;
-  double _resultCount = 2;
+class FilterMealState extends ConsumerState<FilerMeal> {
+  final PageController pageChangeController = PageController();
+  final TextEditingController textControllerCuisine = TextEditingController();
+  final TextEditingController textControllerDiet = TextEditingController();
+  final TextEditingController excludeIngredientController = TextEditingController();
+  final TextEditingController textControllerAllergy = TextEditingController();
+  final TextEditingController mealTypeController = TextEditingController();
+  double minCalories = 500.0;
+  double maxCalories = 1500.0;
+  double resultCount = 2;
 
-  int _currentPage = 0;
+  int onCurrentPage = 0;
 
-  final List<IconData> scrollPageIcons = [
-    Icons.local_grocery_store_outlined,
-    Icons.filter_list,
-  ];
+  static const String noFridgeItem = "no fridge ingredients";
 
-  Future<void> _returnMealSearch() async {
-    const excludeAlcoholIngredients =
-        "vodka,rum,whiskey,brandy,beer,tequila,bourbon,cognac";
+  List<String> selectedIngredients = [];
 
-    final keywords = [
-      'vodka',
-      'rum',
-      'whiskey',
-      'brandy',
-      'beer',
-      'tequila',
-      'bourbon',
-      'cognac',
-      'wine'
-    ];
-
-    final cuisine = _controllerCuisine.text.trim();
-    final diet = _controllerDiet.text.trim();
-    final intolerance = _controllerAllergy.text.trim();
+  Future<void> returnMealSearch() async {
+    final cuisine = textControllerCuisine.text.trim();
+    final diet = textControllerDiet.text.trim();
+    final intolerance = textControllerAllergy.text.trim();
+    final type = mealTypeController.text.trim();
 
     final excludeIngredients = [
-      _controllerExclude.text.trim(),
-      excludeAlcoholIngredients
+      excludeIngredientController.text.trim(),
     ].where((e) => e.isNotEmpty).join(',');
 
     final mealService = MealAPIService();
-    const defaultIngredients = "tomato";
+    final ingredientsArg = selectedIngredients.isNotEmpty
+        ? selectedIngredients.join(', ')
+        : null; // empty → API ignores ingredient filter
 
     try {
       final results = await mealService.getMeal(
-        number: _resultCount.toInt(),
+        number: resultCount.toInt(),
         cuisine: cuisine.isEmpty ? null : cuisine,
         diet: diet.isEmpty ? null : diet,
         intolerances: intolerance.isEmpty ? null : intolerance,
-        excludeIngredients: excludeIngredients.isEmpty ? null : excludeIngredients,
-        minCalories: _minCalories.toInt(),
-        maxCalories: _maxCalories.toInt(),
-        ingredients: defaultIngredients,
+        excludeIngredients:
+            excludeIngredients.isEmpty ? null : excludeIngredients,
+        minCalories: minCalories.toInt(),
+        maxCalories: maxCalories.toInt(),
+        ingredients: ingredientsArg,
+        mealType: type.isEmpty ? null : type,
       );
-      if (results == null) {
+
+      if (results == null || results.results.isEmpty) {
         throw Exception("No meals found.");
+      }
+
+      if (type.isEmpty) {
+        throw Exception("Provide meal type");
       }
 
       final instructionService = GetMealApiInstructionsService();
       final ingredientService = GetMealByIngredient();
 
-      final filtered = results.results.where((meal) {
-        final title = meal.title.toLowerCase();
-        return !keywords.any((word) => title.contains(word));
-      }).toList();
-
-      if (filtered.isEmpty) {
-        throw Exception("No meals found (alcohol is filtered).");
-      }
-
-      // Parallel async loading of meal details
-      final updatedMeals = await Future.wait(filtered.map((meal) async {
+      final searchedMeals = await Future.wait(results.results.map((meal) async {
         final instructions = await instructionService.getInstructions(meal.id);
         final ingredients =
-        await ingredientService.getByIngredients("bun,ketchup,ground meat");
+            await ingredientService.getByIngredients(ingredientsArg ?? '');
 
         meal.instructions = instructions ?? 'No instructions available.';
         meal.ingredients = ingredients ?? [];
@@ -107,7 +95,7 @@ class FilterMealState extends State<FilerMeal> {
 
       if (!mounted) return;
 
-      context.go('/meal_select_screen', extra: updatedMeals);
+      context.go('/meal_select_screen', extra: searchedMeals);
     } catch (e) {
       if (!mounted) return;
 
@@ -117,9 +105,11 @@ class FilterMealState extends State<FilerMeal> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final asyncNames = ref.watch(getUserIngredientListFromFirebase(uid));
+
     return AlertDialog(
       backgroundColor: const Color(0xFFFAFAF9),
       contentPadding: const EdgeInsets.only(left: 25, right: 25),
@@ -127,53 +117,24 @@ class FilterMealState extends State<FilerMeal> {
         borderRadius: BorderRadius.all(Radius.circular(48.0)),
       ),
       content: SizedBox(
-        height: 600,
+        height: 700,
         width: 300,
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Text(
-                "Lets find a meal!",
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  color: mainColor,
-                  fontSize: 30,
-                ),
-              ),
-            ),
-            // Progress Indicator
             Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  2,
-                  (index) => AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    height: 60,
-                    width: _currentPage == index ? 60 : 60,
-                    decoration: BoxDecoration(
-                      color: _currentPage == index
-                          ? const Color(0xFFF2A20C)
-                          : const Color(0xFFD5E5F2),
-                      borderRadius: BorderRadius.circular(48),
-                    ),
-                    child: Icon(scrollPageIcons[index],
-                        color: _currentPage == index
-                            ? const Color(0xFFFAFAF9)
-                            : Colors.transparent),
-                  ),
-                ),
+              padding: const EdgeInsets.all(8.0),
+              child: Lottie.asset(
+                'lib/utils/images/search_animation.json',
+                width: 100,
+                height: 100,
               ),
             ),
             Expanded(
               child: PageView(
-                controller: _pageController,
+                controller: pageChangeController,
                 onPageChanged: (int page) {
                   setState(() {
-                    _currentPage = page;
+                    onCurrentPage = page;
                   });
                 },
                 children: [
@@ -187,19 +148,20 @@ class FilterMealState extends State<FilerMeal> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: TemplateControllerTextbox(
-                                textBoxController: _dishType,
+                              child: TemplateTextBoxWithFlag(
+                                textBoxController: mealTypeController,
                                 textBoxLabel: 'Meal type',
                                 textBoxIcon: Icons.info_outline,
                                 textLabelColor: darkColor,
                                 textBoxFocusedColor: secondaryColor,
                                 textBoxStaticColor: mainColor,
+
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               child: TemplateControllerTextbox(
-                                textBoxController: _controllerCuisine,
+                                textBoxController: textControllerCuisine,
                                 textBoxLabel: 'Pick a cuisine',
                                 textBoxIcon: Icons.language,
                                 textLabelColor: darkColor,
@@ -210,20 +172,9 @@ class FilterMealState extends State<FilerMeal> {
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               child: TemplateControllerTextbox(
-                                textBoxController: _controllerDiet,
+                                textBoxController: textControllerDiet,
                                 textBoxLabel: 'Choose a diet',
                                 textBoxIcon: Icons.eco,
-                                textLabelColor: darkColor,
-                                textBoxFocusedColor: secondaryColor,
-                                textBoxStaticColor: mainColor,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              child: TemplateControllerTextbox(
-                                textBoxController: _controllerAllergy,
-                                textBoxLabel: 'Add your allergy',
-                                textBoxIcon: Icons.sick_outlined,
                                 textLabelColor: darkColor,
                                 textBoxFocusedColor: secondaryColor,
                                 textBoxStaticColor: mainColor,
@@ -241,9 +192,20 @@ class FilterMealState extends State<FilerMeal> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          child: TemplateControllerTextbox(
+                            textBoxController: textControllerAllergy,
+                            textBoxLabel: 'Add your allergy',
+                            textBoxIcon: Icons.sick_outlined,
+                            textLabelColor: darkColor,
+                            textBoxFocusedColor: secondaryColor,
+                            textBoxStaticColor: mainColor,
+                          ),
+                        ),
+                        Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           child: TemplateControllerTextbox(
-                            textBoxController: _controllerExclude,
+                            textBoxController: excludeIngredientController,
                             textBoxLabel: 'Wish to avoid',
                             textBoxIcon: Icons.directions_run_sharp,
                             textLabelColor: darkColor,
@@ -253,14 +215,169 @@ class FilterMealState extends State<FilerMeal> {
                         ),
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 12),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            margin: kIsWeb
+                                ? const EdgeInsets.symmetric(horizontal: 350)
+                                : const EdgeInsets.symmetric(horizontal: 25),
+                            child: asyncNames.when(
+                              loading: () => const CircularProgressIndicator(),
+                              error: (e, _) => Text('Error: $e'),
+                              data: (names) {
+                                final dropdownItems = [noFridgeItem, ...names];
+
+                                return InkWell(
+                                  onTap: () async {
+                                    // ① start with the current selection
+                                    final Set<String> tempSelected =
+                                    selectedIngredients.toSet();
+
+                                    final chosen =
+                                    await showDialog<Set<String>>(
+                                      context: context,
+                                      builder: (context) {
+                                        return StatefulBuilder(
+                                          builder: (context, localSetState) {
+                                            return AlertDialog(
+                                              backgroundColor: backGroundColor,
+                                              title: const Text(
+                                                  'Select ingredients'
+                                              ),
+                                              content: SizedBox(
+                                                width: double.maxFinite,
+                                                child: ListView(
+                                                  shrinkWrap: true,
+                                                  children:
+                                                  dropdownItems.map((item) {
+                                                    final checked = tempSelected
+                                                        .contains(item);
+                                                    return CheckboxListTile(
+                                                      title: Text(item),
+                                                      value: checked,
+                                                      onChanged: (v) {
+                                                        localSetState(() {
+                                                          if (item ==
+                                                              noFridgeItem) {
+                                                            tempSelected
+                                                              ..clear()
+                                                              ..add(
+                                                                  noFridgeItem);
+                                                          } else {
+                                                            tempSelected.remove(
+                                                                noFridgeItem);
+                                                            v == true
+                                                                ? tempSelected
+                                                                .add(item)
+                                                                : tempSelected
+                                                                .remove(
+                                                                item);
+                                                          }
+                                                        });
+                                                      },
+                                                    );
+                                                  }).toList(),
+                                                ),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context),
+                                                  style:
+                                                  ElevatedButton.styleFrom(
+                                                    backgroundColor:
+                                                    const Color(0xFF8B1E3F),
+                                                  ), // cancel
+                                                  child: const Text(
+                                                    'Cancel',
+                                                    style: TextStyle(
+                                                        color: backGroundColor,
+                                                        fontWeight:
+                                                        FontWeight.bold),
+                                                  ),
+                                                ),
+                                                ElevatedButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(context,
+                                                          tempSelected),
+                                                  style: ElevatedButton.styleFrom(
+                                                      backgroundColor: mainColor
+                                                  ),
+                                                  child: const Text(
+                                                    'Ok',
+                                                    style: TextStyle(
+                                                      color: backGroundColor,
+                                                      fontWeight: FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          },
+                                        );
+                                      },
+                                    );
+
+                                    if (chosen != null) {
+                                      setState(() {
+                                        selectedIngredients =
+                                        chosen.contains(noFridgeItem)
+                                            ? []
+                                            : chosen.toList();
+                                      });
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 18),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: darkColor, width: 1),
+                                      borderRadius: BorderRadius.circular(48),
+                                      color: backGroundColor,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            selectedIngredients.isEmpty
+                                                ? 'Select ingredients'
+                                                : selectedIngredients
+                                                .join(', '),
+                                            overflow: TextOverflow.ellipsis,
+                                            style: const TextStyle(
+                                                color: darkColor),
+                                          ),
+                                        ),
+                                        const Icon(Icons.arrow_drop_down,
+                                            color: darkColor),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SingleChildScrollView(
+                    padding: const EdgeInsets.only(bottom: 20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           child: TemplateSlider(
                             color: darkColor,
                             divisions: 10,
                             min: 0,
                             max: 1500,
-                            initialValue: _minCalories,
+                            initialValue: minCalories,
                             onChanged: (value) =>
-                                setState(() => _minCalories = value),
+                                setState(() => minCalories = value),
                             label: 'Minimum calories',
                           ),
                         ),
@@ -271,9 +388,9 @@ class FilterMealState extends State<FilerMeal> {
                             divisions: 10,
                             min: 500,
                             max: 2000,
-                            initialValue: _maxCalories,
+                            initialValue: maxCalories,
                             onChanged: (value) =>
-                                setState(() => _maxCalories = value),
+                                setState(() => maxCalories = value),
                             label: 'Maximum calories',
                           ),
                         ),
@@ -284,9 +401,9 @@ class FilterMealState extends State<FilerMeal> {
                             divisions: 10,
                             min: 1,
                             max: 20,
-                            initialValue: _resultCount,
+                            initialValue: resultCount,
                             onChanged: (value) =>
-                                setState(() => _resultCount = value),
+                                setState(() => resultCount = value),
                             label: 'No. of results',
                           ),
                         ),
@@ -296,21 +413,83 @@ class FilterMealState extends State<FilerMeal> {
                 ],
               ),
             ),
+            // Progress Indicator
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  3,
+                  (index) => AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    height: 8,
+                    width: onCurrentPage == index ? 30 : 8,
+                    decoration: BoxDecoration(
+                      color: onCurrentPage == index
+                          ? const Color(0xFFF2A20C)
+                          : const Color(0xFFD5E5F2),
+                      borderRadius: BorderRadius.circular(48),
+                    ),
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: 10),
             // Progress Indicator
             // Button at the bottom
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                child: SizedBox(
-                  width: 150,
-                  child: ElevatedButton(
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: mainColor),
+                          onPressed: () {
+                            if (onCurrentPage > 0) {
+                              pageChangeController.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                              setState(() {
+                                onCurrentPage--;
+                              });
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.navigate_before,
+                            color: backGroundColor,
+                          )),
+                      IconButton(
+                        onPressed: () {
+                          if (onCurrentPage < 2) {
+                            pageChangeController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                            setState(() {
+                              onCurrentPage++;
+                            });
+                          }
+                        },
+                        icon: const Icon(
+                          Icons.navigate_next,
+                          color: backGroundColor,
+                        ),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: mainColor),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
                       backgroundColor: const Color(0xFFF2A20C),
                     ),
-                    onPressed: _returnMealSearch,
+                    onPressed: returnMealSearch,
                     child: const Text(
                       "Find me a meal!",
                       style: TextStyle(
@@ -319,7 +498,7 @@ class FilterMealState extends State<FilerMeal> {
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
           ],
