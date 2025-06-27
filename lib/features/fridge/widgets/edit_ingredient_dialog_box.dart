@@ -1,38 +1,54 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/ingredient_model.dart';
 import '../services/API/get_ingredient_detailed_information.dart';
+import '../services/Firestore/update_user_specific_ingredient.dart';
 
 const Color mainColor = Color(0xFFF27507);
 const Color secondaryColor = Color(0xFF3C4C59);
 const Color backGroundColor = Color(0xFFFAFAF9);
 const Color darkColor = Color(0xFF2B2B2B);
-class SaveIngredientDialogBox extends StatefulWidget {
-  final Ingredient partialIngredient; // From search, without amount/unit
 
+class UpdateIngredientDialogBox extends ConsumerStatefulWidget {
   final List<String> units;
+  final Ingredient ingredient;
 
-  const SaveIngredientDialogBox({
+  const UpdateIngredientDialogBox({
     super.key,
-    required this.partialIngredient,
     required this.units,
+    required this.ingredient,
   });
 
   @override
-  State<SaveIngredientDialogBox> createState() =>
-      _SaveIngredientDialogBoxState();
+  ConsumerState<UpdateIngredientDialogBox> createState() =>
+      UpdateIngredientDialogBoxState();
 }
 
-class _SaveIngredientDialogBoxState extends State<SaveIngredientDialogBox> {
-  final TextEditingController amountTextController = TextEditingController();
+class UpdateIngredientDialogBoxState
+    extends ConsumerState<UpdateIngredientDialogBox> {
+  late final TextEditingController amountTextController;
   late String unitSelected;
 
   @override
   void initState() {
     super.initState();
-    unitSelected = widget.units.isNotEmpty ? widget.units.first : '';
+    amountTextController = TextEditingController(
+      text: widget.ingredient.amount.toString(),
+    );
+
+    // Select current unit if available, else fallback to first unit
+    unitSelected = widget.units.contains(widget.ingredient.unit)
+        ? widget.ingredient.unit
+        : (widget.units.isNotEmpty ? widget.units.first : '');
+  }
+
+  @override
+  void dispose() {
+    amountTextController.dispose();
+    super.dispose();
   }
 
   @override
@@ -40,10 +56,11 @@ class _SaveIngredientDialogBoxState extends State<SaveIngredientDialogBox> {
     return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: const Text(
-        "You were about to add...",
+        "You are editing...",
         style: TextStyle(
           fontWeight: FontWeight.bold,
           color: darkColor,
+          fontSize: 25,
         ),
       ),
       backgroundColor: backGroundColor,
@@ -58,7 +75,7 @@ class _SaveIngredientDialogBoxState extends State<SaveIngredientDialogBox> {
               color: mainColor,
             ),
             child: Text(
-              widget.partialIngredient.name,
+              widget.ingredient.name,
               style: const TextStyle(
                 color: backGroundColor,
                 fontWeight: FontWeight.bold,
@@ -69,14 +86,17 @@ class _SaveIngredientDialogBoxState extends State<SaveIngredientDialogBox> {
           TextField(
             controller: amountTextController,
             keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))
+            ],
             decoration: InputDecoration(
               labelText: 'Amount',
               labelStyle: const TextStyle(
                 color: secondaryColor,
                 fontWeight: FontWeight.bold,
               ),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(48)),
+              border:
+              OutlineInputBorder(borderRadius: BorderRadius.circular(48)),
               focusedBorder: OutlineInputBorder(
                 borderSide: const BorderSide(color: mainColor),
                 borderRadius: BorderRadius.circular(48),
@@ -87,7 +107,10 @@ class _SaveIngredientDialogBoxState extends State<SaveIngredientDialogBox> {
           DropdownButtonFormField<String>(
             value: unitSelected,
             items: widget.units
-                .map((unit) => DropdownMenuItem(value: unit, child: Text(unit)))
+                .map((unit) => DropdownMenuItem(
+              value: unit,
+              child: Text(unit),
+            ))
                 .toList(),
             onChanged: (val) {
               if (val != null) setState(() => unitSelected = val);
@@ -98,7 +121,8 @@ class _SaveIngredientDialogBoxState extends State<SaveIngredientDialogBox> {
                 color: secondaryColor,
                 fontWeight: FontWeight.bold,
               ),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(48)),
+              border:
+              OutlineInputBorder(borderRadius: BorderRadius.circular(48)),
               focusedBorder: OutlineInputBorder(
                 borderSide: const BorderSide(color: mainColor),
                 borderRadius: BorderRadius.circular(48),
@@ -115,7 +139,8 @@ class _SaveIngredientDialogBoxState extends State<SaveIngredientDialogBox> {
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
           ),
           onPressed: () async {
-            final amount = double.tryParse(amountTextController.text.trim()) ?? 0;
+            final amount =
+                double.tryParse(amountTextController.text.trim()) ?? 0;
             if (amount <= 0) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Enter a valid amount')),
@@ -124,9 +149,8 @@ class _SaveIngredientDialogBoxState extends State<SaveIngredientDialogBox> {
             }
 
             final uid = FirebaseAuth.instance.currentUser!.uid;
-            final id = widget.partialIngredient.id;
+            final id = widget.ingredient.id;
             final unit = unitSelected;
-
 
             final infoService = IngredientInfoService();
             final calories = await infoService.fetchCalories(id, amount, unit);
@@ -139,18 +163,16 @@ class _SaveIngredientDialogBoxState extends State<SaveIngredientDialogBox> {
               return;
             }
 
-            final completeIngredient = Ingredient.fromSearch(
-              id: id,
-              name: widget.partialIngredient.name,
+            final service = ref.read(updateUserSpecificIngredientProvider);
+            await service.updateUserIngredient(
+              uid: uid,
+              ingredientId: id,
               amount: amount,
               unit: unit,
-              userId: uid,
-              nutrition: calories,
             );
 
-            if(!context.mounted) return;
-            Navigator.of(context).pop(completeIngredient);
-
+            if (!context.mounted) return;
+            Navigator.of(context).pop(); // success
           },
           child: const Text(
             "Save",
