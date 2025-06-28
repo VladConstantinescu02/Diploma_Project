@@ -1,13 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DeleteMealFromFirebase {
+class DeleteAllUserIngredientsFromFirebase {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> deleteMeals({required String userId}) async {
+  Future<void> deleteIngredients({required String userId}) async {
     try {
       final snap = await _firestore
-          .collection('meals')
+          .collection('fridgeItems')
           .where('userId', isEqualTo: userId)
           .get();
 
@@ -15,10 +15,11 @@ class DeleteMealFromFirebase {
         await doc.reference.delete();
       }
     } catch (e) {
-      throw Exception('Error while deleting meals: $e');
+      throw Exception('Error while deleting fridge items: $e');
     }
   }
 }
 
-final deleteMealsServiceProvider =
-Provider<DeleteMealFromFirebase>((ref) => DeleteMealFromFirebase());
+final deleteFridgeItemsServiceProvider =
+Provider<DeleteAllUserIngredientsFromFirebase>(
+        (ref) => DeleteAllUserIngredientsFromFirebase());

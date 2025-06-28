@@ -174,101 +174,33 @@ class ProfileScreen extends ConsumerWidget {
                           buttonText: 'Submit',
                           buttonTextColor: backGroundColor,
                           dialogBackgroundColor: backGroundColor,
-
                           onSubmit: (newUsername) async {
-                            Navigator.of(context).pop(); // close the dialog first
+                            Navigator.of(context)
+                                .pop(); // close the dialog first
 
                             if (!context.mounted) return;
                             await QuickAlert.show(
                               context: context,
                               type: QuickAlertType.success,
-                              text: 'Username set to "$newUsername"',
-                              autoCloseDuration: const Duration(seconds: 2),
+                              text: 'Username is about to be updated',
+                              autoCloseDuration:
+                                  const Duration(milliseconds: 500),
+                              confirmBtnColor: const Color(0xFFF27507),
+                              confirmBtnText: 'OK',
+                              // optional label
+                              confirmBtnTextStyle: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              borderRadius: 48,
                             );
 
                             try {
                               final updateUserName =
-                              ref.read(updateUserNameService);
-                              await updateUserName
-                                  .updateUsername(newUsername);
+                                  ref.read(updateUserNameService);
+                              await updateUserName.updateUsername(newUsername);
                               ref.read(usernameProvider.notifier).state =
                                   newUsername;
-
-                            } on FirebaseAuthException catch (e) {
-                              if (!context.mounted) return;
-
-                              String errorMessage =
-                              getFirebaseAuthErrorMessage(e);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                    content: Text(errorMessage),
-                                    backgroundColor: const Color(0xFF8B1E3F)),
-                              );
-                            } catch (e) {
-                              if (!context.mounted) return;
-
-
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content:
-                                  Text("An unexpected error occurred."),
-                                  backgroundColor: Color(0xFF8B1E3F),
-                                ),
-                              );
-                            }
-                          },
-                        ),
-                      );
-                    },
-                    child: const Text("Edit Username"),
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: 16.0 * 2),
-            const Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 20),
-                child: Text('Danger zone',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    )),
-              ),
-            ),
-            Row(
-              children: [
-                SizedBox(
-                  width: 180,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      backgroundColor: const Color(0xFF8B1E3F),
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 48),
-                      shape: const StadiumBorder(),
-                    ),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) => DeleteAccountDialogBox(
-                          title: 'Delete your account',
-                          label1: 'Enter your email',
-                          label2: 'Enter your password',
-                          icon1: Icons.email_outlined,
-                          icon2: Icons.password_outlined,
-                          buttonColor: const Color(0xFF8B1E3F),
-                          buttonTextColor: const Color(0xFFFAFAF9),
-                          buttonText: 'Goodbye!',
-                          dialogBackgroundColor: const Color(0xFFFAFAF9),
-                          onSubmit: (email, password) async {
-                            try {
-                              final deleteUserService =
-                                  ref.read(deleteUserServiceProvider);
-                              await deleteUserService.deleteAccount(
-                                  email: email, password: password);
                             } on FirebaseAuthException catch (e) {
                               if (!context.mounted) return;
 
@@ -294,12 +226,10 @@ class ProfileScreen extends ConsumerWidget {
                         ),
                       );
                     },
-                    child: const Text("Delete account"),
+                    child: const Text("Edit Username"),
                   ),
                 ),
-                const Spacer(
-                  flex: 1,
-                ),
+                const Spacer(),
                 SizedBox(
                   width: 180,
                   child: ElevatedButton(
@@ -328,10 +258,13 @@ class ProfileScreen extends ConsumerWidget {
                             await QuickAlert.show(
                               context: context,
                               type: QuickAlertType.success,
+                              title: 'Password reset',
                               text: 'Check your email!',
-                              autoCloseDuration: const Duration(milliseconds: 500),
+                              autoCloseDuration:
+                                  const Duration(milliseconds: 500),
                               confirmBtnColor: const Color(0xFFF27507),
-                              confirmBtnText: 'OK', // optional label
+                              confirmBtnText: 'OK',
+                              // optional label
                               confirmBtnTextStyle: const TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600,
@@ -361,6 +294,98 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                 ),
               ],
+            ),
+            const Divider(
+              height: 16.0 * 2,
+              color: backGroundColor,
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(48),
+                color: const Color(0xFF8B1E3F),
+              ),
+              child: Row(
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(12, 8, 0, 8),
+                    child: Text('Danger zone',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                          color: backGroundColor,
+                        )),
+                  ),
+                  const Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      height: 40,
+                      width: 180,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: backGroundColor,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 48),
+                          shape: const StadiumBorder(),
+                        ),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => DeleteAccountDialogBox(
+                              title: 'Delete your account',
+                              label1: 'Enter your email',
+                              label2: 'Enter your password',
+                              icon1: Icons.email_outlined,
+                              icon2: Icons.password_outlined,
+                              buttonColor: const Color(0xFF8B1E3F),
+                              buttonTextColor: const Color(0xFFFAFAF9),
+                              buttonText: 'Goodbye!',
+                              dialogBackgroundColor: const Color(0xFFFAFAF9),
+                              onSubmit: (email, password) async {
+                                try {
+                                  final deleteUserService =
+                                      ref.read(deleteUserServiceProvider);
+                                  await deleteUserService.deleteAccount(
+                                      email: email, password: password);
+                                } on FirebaseAuthException catch (e) {
+                                  if (!context.mounted) return;
+
+                                  String errorMessage =
+                                      getFirebaseAuthErrorMessage(e);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(errorMessage),
+                                        backgroundColor:
+                                            const Color(0xFF8B1E3F)),
+                                  );
+                                } catch (e) {
+                                  if (!context.mounted) return;
+
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content:
+                                          Text("An unexpected error occurred."),
+                                      backgroundColor: Color(0xFF8B1E3F),
+                                    ),
+                                  );
+                                }
+                              },
+                            ),
+                          );
+                        },
+                        child: const Text(
+                          "Delete account",
+                          style: TextStyle(
+                            color: Color(0xFF8B1E3F),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

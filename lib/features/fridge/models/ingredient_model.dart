@@ -48,7 +48,7 @@ class Ingredient {
       name: json['name'] as String,
       amount: (json['quantity'] as num).toDouble(),
       unit: json['unit'] as String,
-      userId: json['userID'] as String,
+      userId: json['userId'] as String,
       nutrition: (json['nutrition'] as num).toDouble(),
     );
   }
@@ -60,7 +60,7 @@ class Ingredient {
         'name': name,
         'quantity': amount,
         'unit': unit,
-        'userID': userId,
+        'userId': userId,
         'nutrition': nutrition,
       };
 

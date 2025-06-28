@@ -11,7 +11,7 @@ class DeleteSpecificIngredient {
   Future<void> deleteSpecificUserIngredient(
       {required String uid, required int ingredientId}) async {
     final query = await userIngredient
-        .where('userID', isEqualTo: uid)
+        .where('userId', isEqualTo: uid)
         .where('ingredientId', isEqualTo: ingredientId)
         .get();
 

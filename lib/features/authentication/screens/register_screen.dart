@@ -89,7 +89,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       }
 
       await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'userID': user.uid,
+        'userId': user.uid,
         'username': username,
         'email': email,
         'profilePhoto': profilePhotoUrl ?? '',

@@ -4,91 +4,67 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../meals/services/FireStore/delete_meals_from_firestore.dart';
+import '../../meals/services/Firestore/delete_all_user_fridge_items.dart';
+import '../../meals/services/firestore/delete_meals_from_firestore.dart';
 
+/// ── PROVIDER ───────────────────────────────────────────────────────────────
 final deleteUserServiceProvider = Provider<DeleteUserService>((ref) {
-  final deleteMealsService = ref.read(deleteMealsFromFirestoreServiceProvider);
-  return DeleteUserService(deleteMealsService: deleteMealsService);
+  final mealsSvc   = ref.read(deleteMealsServiceProvider);
+  final fridgeSvc  = ref.read(deleteFridgeItemsServiceProvider);
+
+  return DeleteUserService(
+    deleteMeals: mealsSvc,
+    deleteFridge: fridgeSvc,
+  );
 });
 
+/// ── SERVICE ────────────────────────────────────────────────────────────────
 class DeleteUserService {
-  final FirebaseAuth firebaseAuth;
-  final FirebaseFirestore firestore;
-  final FirebaseStorage firebaseStorage;
-  final DeleteMealFromFirebase deleteMealsService;
+  final FirebaseAuth _auth;
+  final FirebaseFirestore _firestore;
+  final FirebaseStorage _storage;
+  final DeleteMealFromFirebase _deleteMeals;
+  final DeleteAllUserIngredientsFromFirebase _deleteFridge;
 
   DeleteUserService({
-    FirebaseAuth? firebaseAuth,
+    FirebaseAuth? auth,
     FirebaseFirestore? firestore,
-    FirebaseStorage? firebaseStorage,
-    required this.deleteMealsService,
-  })  : firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-        firestore = firestore ?? FirebaseFirestore.instance,
-        firebaseStorage = firebaseStorage ?? FirebaseStorage.instance;
+    FirebaseStorage? storage,
+    required DeleteMealFromFirebase deleteMeals,
+    required DeleteAllUserIngredientsFromFirebase deleteFridge,
+  })  : _auth = auth ?? FirebaseAuth.instance,
+        _firestore = firestore ?? FirebaseFirestore.instance,
+        _storage = storage ?? FirebaseStorage.instance,
+        _deleteMeals = deleteMeals,
+        _deleteFridge = deleteFridge;
 
   Future<void> deleteAccount({
     required String email,
     required String password,
   }) async {
-    final user = firebaseAuth.currentUser;
-
-
-    if (user == null) {
-      throw Exception("No user signed in.");
-    }
+    final user = _auth.currentUser;
+    if (user == null) throw Exception('No user signed in');
 
     final uid = user.uid;
 
+    // 1️⃣ Re-authenticate
+    final cred =
+    EmailAuthProvider.credential(email: email, password: password);
+    await user.reauthenticateWithCredential(cred);
+
+    // 2️⃣ Delete meals & fridge items
+    await _deleteMeals.deleteMeals(userId: uid);
+    await _deleteFridge.deleteIngredients(userId: uid);
+
+    // 3️⃣ Delete profile picture (if any)
     try {
-      final credential = EmailAuthProvider.credential(
-        email: email,
-        password: password,
-      );
-
-      await user.reauthenticateWithCredential(credential);
-
-      await deleteMealsService.deleteMealFromFireStore(userId: uid);
-
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child("users/$uid/profile_picture.jpg");
-      try {
-        await storageRef.delete();
-      } catch (e) {
-        debugPrint("No profile picture found to delete: $e");
-      }
-
-      await firestore.collection('users').doc(uid).delete();
-      await user.delete();
-    } on FirebaseAuthException catch (e) {
-      throw FirebaseAuthException(code: e.code, message: e.message);
-    } catch (e) {
-      throw Exception("Failed to delete account: ${e.toString()}");
-    }
-  }
-
-  Future<void> deleteAccountProfileImage() async {
-    final String uid = firebaseAuth.currentUser?.uid ??
-        (throw Exception("No user signed in"));
-
-    final imageRef =
-    firebaseStorage.ref().child("users/$uid/profile_picture.jpg");
-
-    try {
-      await imageRef.delete();
-      if (kDebugMode) {
-        print("Profile image deleted");
-      }
+      await _storage.ref('users/$uid/profile_picture.jpg').delete();
     } on FirebaseException catch (e) {
-      if (e.code == 'object-not-found') {
-        if (kDebugMode) {
-          print("Profile image not found");
-        }
-      } else {
-        if (kDebugMode) {
-          print("Failed to delete profile photo $e");
-        }
-      }
+      debugPrint('No profile picture to delete: ${e.code}');
     }
+
+    // 4️⃣ Delete user document & auth account
+    await _firestore.collection('users').doc(uid).delete();
+    await user.delete();
   }
 }

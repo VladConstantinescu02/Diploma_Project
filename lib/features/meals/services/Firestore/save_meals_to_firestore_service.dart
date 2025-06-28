@@ -19,7 +19,7 @@ class SaveToFirestoreMealsService {
 
 
   Future<void> addMealToFireStore(
-      {required Meal meal, required String userID}) async {
+      {required Meal meal, required String userId}) async {
     final mealID = uuid.v4();
     await _mealsCollection.add({
       'name': meal.title,

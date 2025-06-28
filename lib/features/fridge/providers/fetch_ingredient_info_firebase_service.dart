@@ -20,7 +20,7 @@ class FirestoreIngredientService {
 
   Stream<List<Ingredient>> getIngredients(String userId) {
     return _items
-        .where('userID', isEqualTo: userId) // ← field must be userID
+        .where('userId', isEqualTo: userId) // ← field must be userId
         .snapshots()
         .map((snap) => snap.docs.map((doc) {
       final data = doc.data() as Map<String, dynamic>;
