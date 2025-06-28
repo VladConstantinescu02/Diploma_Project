@@ -8,24 +8,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../authentication/models/authentication_service.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import '../../../shared/widgets/one_textbox_dialog_box.dart';
 import '../../../shared/errors/authentication_service_error_handling.dart';
 import '../../../shared/widgets/profile_picture.dart';
+import '../../authentication/services/authentication_service.dart';
 
 const Color mainColor = Color(0xFFF27507);
 const Color secondaryColor = Color(0xFF3C4C59);
 const Color backGroundColor = Color(0xFFFAFAF9);
 const Color darkColor = Color(0xFF2B2B2B);
 
-// This fetches the username on initialization (from Firebase)
 final usernameOnInitProvider = Provider<String>((ref) {
   final user = FirebaseAuth.instance.currentUser;
   return user?.displayName ?? 'Default Username';
 });
 
-// This will be the updatable username state
 final usernameProvider = StateProvider<String>((ref) {
   return ref.watch(usernameOnInitProvider);
 });
@@ -38,7 +37,6 @@ class ProfileScreen extends ConsumerWidget {
     final authService = ref.watch(authServiceProvider);
 
     final email = authService.email ?? 'you@mail.com';
-    // Watch the username state
     final username = ref.watch(usernameProvider);
 
     return Scaffold(
@@ -167,46 +165,60 @@ class ProfileScreen extends ConsumerWidget {
                     ),
                     onPressed: () {
                       showDialog(
-                          context: context,
-                          builder: (context) => OneTextBoxDialogBox(
-                                title: 'Change you user name',
-                                label: 'Enter your username',
-                                icon: Icons.person_add_alt_1_outlined,
-                                onSubmit: (newUsername) async {
-                                  try {
-                                    final updateUserName =
-                                        ref.read(updateUserNameService);
-                                    await updateUserName
-                                        .updateUsername(newUsername);
-                                    ref.read(usernameProvider.notifier).state =
-                                        newUsername;
-                                  } on FirebaseAuthException catch (e) {
-                                    if (!context.mounted) return;
+                        context: context,
+                        builder: (context) => OneTextBoxDialogBox(
+                          title: 'Change your user name',
+                          label: 'Enter your username',
+                          icon: Icons.person_add_alt_1_outlined,
+                          buttonColor: mainColor,
+                          buttonText: 'Submit',
+                          buttonTextColor: backGroundColor,
+                          dialogBackgroundColor: backGroundColor,
 
-                                    String errorMessage =
-                                    getFirebaseAuthErrorMessage(e);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(errorMessage),
-                                          backgroundColor: const Color(0xFF8B1E3F)),
-                                    );
-                                  } catch (e) {
-                                    if (!context.mounted) return;
+                          onSubmit: (newUsername) async {
+                            Navigator.of(context).pop(); // close the dialog first
 
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          content:
-                                          Text("An unexpected error occurred."),
-                                          backgroundColor: Color(0xFF8B1E3F),
-                                        ),
-                                    );
-                                  }
-                                },
-                                buttonColor: mainColor,
-                                buttonText: 'Summit',
-                                buttonTextColor: backGroundColor,
-                                dialogBackgroundColor: backGroundColor,
-                              ));
+                            if (!context.mounted) return;
+                            await QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.success,
+                              text: 'Username set to "$newUsername"',
+                              autoCloseDuration: const Duration(seconds: 2),
+                            );
+
+                            try {
+                              final updateUserName =
+                              ref.read(updateUserNameService);
+                              await updateUserName
+                                  .updateUsername(newUsername);
+                              ref.read(usernameProvider.notifier).state =
+                                  newUsername;
+
+                            } on FirebaseAuthException catch (e) {
+                              if (!context.mounted) return;
+
+                              String errorMessage =
+                              getFirebaseAuthErrorMessage(e);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text(errorMessage),
+                                    backgroundColor: const Color(0xFF8B1E3F)),
+                              );
+                            } catch (e) {
+                              if (!context.mounted) return;
+
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content:
+                                  Text("An unexpected error occurred."),
+                                  backgroundColor: Color(0xFF8B1E3F),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      );
                     },
                     child: const Text("Edit Username"),
                   ),
@@ -310,6 +322,23 @@ class ProfileScreen extends ConsumerWidget {
                           buttonTextColor: const Color(0xFFFAFAF9),
                           dialogBackgroundColor: const Color(0xFFFAFAF9),
                           onSubmit: (email) async {
+                            Navigator.of(context).pop();
+
+                            if (!context.mounted) return;
+                            await QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.success,
+                              text: 'Check your email!',
+                              autoCloseDuration: const Duration(milliseconds: 500),
+                              confirmBtnColor: const Color(0xFFF27507),
+                              confirmBtnText: 'OK', // optional label
+                              confirmBtnTextStyle: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              borderRadius: 48,
+                            );
+
                             try {
                               await authService.resetPassword(email: email);
                             } on FirebaseAuthException catch (e) {

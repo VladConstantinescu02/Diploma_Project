@@ -6,12 +6,12 @@ import 'package:go_router/go_router.dart';
 import '../models/meal_model.dart';
 import '../services/FireStore/save_meals_to_firestore_service.dart';
 
-
 class MealSelectionScreen extends ConsumerStatefulWidget {
   const MealSelectionScreen({super.key});
 
   @override
-  ConsumerState<MealSelectionScreen> createState() => _MealSelectionScreenState();
+  ConsumerState<MealSelectionScreen> createState() =>
+      _MealSelectionScreenState();
 }
 
 class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
@@ -30,6 +30,16 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
         _meals = meals;
       });
     }
+  }
+
+  List<String> filterHTMLElements(String response) {
+    if (RegExp(r"<li>").hasMatch(response)) {
+      return RegExp(r"<li>(.*?)</li>", dotAll: true)        // dotAll ⇒ matches multiline
+          .allMatches(response)
+          .map((m) => m.group(1)!.trim())
+          .toList();
+    }
+    return [response.trim()];
   }
 
   @override
@@ -159,7 +169,7 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
                                             padding: const EdgeInsets.symmetric(
                                                 vertical: 12),
                                             child: Text(
-                                              meal.instructions!,
+                                              filterHTMLElements(meal.instructions!).join('\n'),
                                               style: const TextStyle(
                                                   fontSize: 13,
                                                   color: Colors.black87),
@@ -170,15 +180,17 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
                                     if (meal.sourceName != null &&
                                         meal.sourceName!.isNotEmpty)
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 12),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
                                         child: Column(
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                              CrossAxisAlignment.start,
                                           children: [
-                                            const Text('Found originally at:',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w600,
-                                                ),
+                                            const Text(
+                                              'Found originally at:',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
                                             Text(
                                               meal.sourceName!,
@@ -186,65 +198,77 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
                                           ],
                                         ),
                                       ),
-                                      if (meal.sourceUrl != null && meal.sourceUrl!.isNotEmpty)
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 12),
-                                          child: Column(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                            children: [
-                                              const Text('Find out more:',
-                                                style: TextStyle(
-                                                  fontWeight: FontWeight.w600,
-                                                ),
+                                    if (meal.sourceUrl != null &&
+                                        meal.sourceUrl!.isNotEmpty)
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 12),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Find out more:',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
                                               ),
-                                              Text(
-                                                meal.sourceUrl!,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                              const Color(0xFFF27507),
-                                          elevation: 0,
-                                        ),
-                                        onPressed: () async {
-                                          try {
-                                            final userID = FirebaseAuth.instance.currentUser?.uid;
-
-                                            if (userID == null) {
-                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text("User not logged in."),
-                                                  backgroundColor: Color(0xFF8B1E3F),
-                                                ),
-                                              );
-                                              return;
-                                            }
-
-                                            // This assumes you have a Provider<SaveToFirestoreMealsService>
-                                            final saveMealService = ref.read(saveToFirestoreMealsServiceProvider);
-
-                                            await saveMealService.addMealToFireStore(meal: meal, userID: userID);
-                                          } catch (e) {
-                                            if (!context.mounted) return;
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              SnackBar(
-                                                content: Text("An unexpected error occurred: $e"),
-                                                backgroundColor: const Color(0xFF8B1E3F),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                        child: const Text(
-                                          "Save to account",
-                                          style: TextStyle(
-                                            color: Color(0xFFFAFAF9),
-                                          ),
+                                            ),
+                                            Text(
+                                              meal.sourceUrl!,
+                                            ),
+                                          ],
                                         ),
                                       ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFFF27507),
+                                        elevation: 0,
+                                      ),
+                                      onPressed: () async {
+                                        try {
+                                          final userID = FirebaseAuth
+                                              .instance.currentUser?.uid;
+
+                                          if (userID == null) {
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(
+                                              const SnackBar(
+                                                content:
+                                                    Text("User not logged in."),
+                                                backgroundColor:
+                                                    Color(0xFF8B1E3F),
+                                              ),
+                                            );
+                                            return;
+                                          }
+
+                                          final saveMealService = ref.read(
+                                              saveToFirestoreMealsServiceProvider);
+
+                                          await saveMealService
+                                              .addMealToFireStore(
+                                                  meal: meal, userID: userID);
+                                        } catch (e) {
+                                          if (!context.mounted) return;
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  "An unexpected error occurred: $e"),
+                                              backgroundColor:
+                                                  const Color(0xFF8B1E3F),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      child: const Text(
+                                        "Save to account",
+                                        style: TextStyle(
+                                          color: Color(0xFFFAFAF9),
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),

@@ -10,7 +10,8 @@ class OneTextBoxDialogBox extends StatefulWidget {
   final String title;
   final String label;
   final IconData icon;
-  final Function(String) onSubmit;
+  final Future<void> Function(String) onSubmit;
+
   final Color buttonColor;
   final String buttonText;
   final Color buttonTextColor;
@@ -54,13 +55,14 @@ class _OneTextBoxDialogBoxState extends State<OneTextBoxDialogBox> {
             backgroundColor: widget.buttonColor,
             foregroundColor: Colors.white,
           ),
-          onPressed: () {
+          onPressed: () async {
             final input = _controller.text.trim();
-            widget.onSubmit(input);
-            Navigator.of(context).pop();
+            if (input.isEmpty) return;
+
+            await widget.onSubmit(input);
           },
           child: Text(
-              widget.buttonText,
+            widget.buttonText,
             style: TextStyle(
               color: widget.buttonTextColor,
               fontWeight: FontWeight.w400,

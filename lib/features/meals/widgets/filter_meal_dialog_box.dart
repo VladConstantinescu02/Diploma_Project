@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:diploma_prj/features/meals/widgets/to_int_slider.dart';
 import 'package:diploma_prj/shared/widgets/slider_template.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
@@ -41,7 +43,6 @@ class FilterMealState extends ConsumerState<FilerMeal> {
   static const String noFridgeItem = "no fridge ingredients";
 
   List<String> selectedIngredients = [];
-
   Future<void> returnMealSearch() async {
     final cuisine = textControllerCuisine.text.trim();
     final diet = textControllerDiet.text.trim();
@@ -58,13 +59,22 @@ class FilterMealState extends ConsumerState<FilerMeal> {
         : null; // empty → API ignores ingredient filter
 
     try {
+      print("Fetching meals with the following parameters:");
+      print("Cuisine: $cuisine");
+      print("Diet: $diet");
+      print("Intolerance: $intolerance");
+      print("Exclude Ingredients: $excludeIngredients");
+      print("Ingredients: $ingredientsArg");
+      print("Meal Type: $type");
+      print("Calories: $minCalories - $maxCalories");
+
       final results = await mealService.getMeal(
         number: resultCount.toInt(),
         cuisine: cuisine.isEmpty ? null : cuisine,
         diet: diet.isEmpty ? null : diet,
         intolerances: intolerance.isEmpty ? null : intolerance,
         excludeIngredients:
-            excludeIngredients.isEmpty ? null : excludeIngredients,
+        excludeIngredients.isEmpty ? null : excludeIngredients,
         minCalories: minCalories.toInt(),
         maxCalories: maxCalories.toInt(),
         ingredients: ingredientsArg,
@@ -72,10 +82,16 @@ class FilterMealState extends ConsumerState<FilerMeal> {
       );
 
       if (results == null || results.results.isEmpty) {
+        if (kDebugMode) {
+          print("No meals found.");
+        }
         throw Exception("No meals found.");
       }
 
       if (type.isEmpty) {
+        if (kDebugMode) {
+          print("Meal type is empty.");
+        }
         throw Exception("Provide meal type");
       }
 
@@ -83,9 +99,12 @@ class FilterMealState extends ConsumerState<FilerMeal> {
       final ingredientService = GetMealByIngredient();
 
       final searchedMeals = await Future.wait(results.results.map((meal) async {
+        if (kDebugMode) {
+          print("Fetching instructions and ingredients for meal ID: ${meal.id}");
+        }
         final instructions = await instructionService.getInstructions(meal.id);
         final ingredients =
-            await ingredientService.getByIngredients(ingredientsArg ?? '');
+        await ingredientService.getByIngredients(ingredientsArg ?? '');
 
         meal.instructions = instructions ?? 'No instructions available.';
         meal.ingredients = ingredients ?? [];
@@ -95,8 +114,14 @@ class FilterMealState extends ConsumerState<FilerMeal> {
 
       if (!mounted) return;
 
+      if (kDebugMode) {
+        print("Navigating to meal select screen with meals: $searchedMeals");
+      }
       context.go('/meal_select_screen', extra: searchedMeals);
     } catch (e) {
+      if (kDebugMode) {
+        print("Error occurred: ${e.toString()}");
+      }
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -104,6 +129,7 @@ class FilterMealState extends ConsumerState<FilerMeal> {
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

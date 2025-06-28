@@ -6,8 +6,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../shared/widgets/text_box_widget.dart';
-import '../models/authentication_service.dart';
 import 'package:go_router/go_router.dart';
+
+import '../services/authentication_service.dart';
 
 // Colors (keep your design)
 const Color mainColor = Color(0xFFF27507);
@@ -23,9 +24,9 @@ class RegisterScreen extends ConsumerStatefulWidget {
 }
 
 class _RegisterScreenState extends ConsumerState<RegisterScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController usernameController = TextEditingController();
 
   Uint8List? pickedImage;
 
@@ -47,9 +48,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   // Main register function
   Future<void> register() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-    final username = _usernameController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final username = usernameController.text.trim();
 
     if (username.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -146,13 +147,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 ),
               ),
 
+
               const SizedBox(height: 25),
 
               // Email Input
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: TemplateControllerTextbox(
-                  textBoxController: _emailController,
+                  textBoxController: emailController,
                   textBoxLabel: 'Your Email',
                   textBoxIcon: Icons.email_outlined,
                   textLabelColor: darkColor,
@@ -165,7 +167,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: TemplateControllerTextbox(
-                  textBoxController: _usernameController,
+                  textBoxController: usernameController,
                   textBoxLabel: 'Your username',
                   textBoxIcon: Icons.supervised_user_circle_outlined,
                   textLabelColor: darkColor,
@@ -178,7 +180,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: TemplateControllerTextbox(
-                  textBoxController: _passwordController,
+                  textBoxController: passwordController,
                   textBoxLabel: 'Your password',
                   textBoxIcon: Icons.password_outlined,
                   textLabelColor: darkColor,
@@ -206,7 +208,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     child: const Text(
                       "Sign up",
                       style: TextStyle(
-                        color: Colors.black,
+                        color: backGroundColor,
                         fontWeight: FontWeight.w800,
                         fontSize: 20,
                       ),

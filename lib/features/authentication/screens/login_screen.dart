@@ -1,4 +1,3 @@
-import 'package:diploma_prj/features/authentication/models/authentication_service.dart';
 import 'package:diploma_prj/shared/widgets/one_textbox_dialog_box.dart';
 import 'package:diploma_prj/shared/widgets/text_box_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,6 +9,7 @@ import 'package:lottie/lottie.dart';
 
 import '../../../shared/errors/authentication_service_error_handling.dart';
 import '../../../shared/widgets/template_obscured_input_field.dart';
+import '../services/authentication_service.dart';
 
 // Replace with actual colors or use default Material colors
 const Color mainColor = Color(0xFFF27507);
