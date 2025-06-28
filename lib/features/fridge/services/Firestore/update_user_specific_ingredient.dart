@@ -14,7 +14,7 @@ class UpdateUserSpecificIngredient {
       required double amount,
       required String unit}) async {
     final query = await userIngredient
-        .where('userID', isEqualTo: uid)
+        .where('userId', isEqualTo: uid)
         .where('ingredientId', isEqualTo: ingredientId)
         .limit(1)
         .get();

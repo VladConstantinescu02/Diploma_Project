@@ -227,10 +227,10 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
                                       ),
                                       onPressed: () async {
                                         try {
-                                          final userID = FirebaseAuth
+                                          final userId = FirebaseAuth
                                               .instance.currentUser?.uid;
 
-                                          if (userID == null) {
+                                          if (userId == null) {
                                             ScaffoldMessenger.of(context)
                                                 .showSnackBar(
                                               const SnackBar(
@@ -248,7 +248,7 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
 
                                           await saveMealService
                                               .addMealToFireStore(
-                                                  meal: meal, userID: userID);
+                                                  meal: meal, userId: userId);
                                         } catch (e) {
                                           if (!context.mounted) return;
                                           ScaffoldMessenger.of(context)

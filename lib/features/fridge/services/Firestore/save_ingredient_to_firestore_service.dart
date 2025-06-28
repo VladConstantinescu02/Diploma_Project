@@ -9,7 +9,7 @@ final saveIngredientsToFirestoreProvider = Provider<SaveIngredientToFirestore>((
 class SaveIngredientToFirestore {
   final ingredients = FirebaseFirestore.instance.collection('fridgeItems');
 
-  // ✔ 1) fixed spelling, 2) no extra userID param needed
+  // ✔ 1) fixed spelling, 2) no extra userId param needed
   Future<void> addIngredientToFirestore({
     required Ingredient ingredient,
   }) async {

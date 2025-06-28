@@ -7,7 +7,7 @@ final getUserIngredientListFromFirebase =
       FirebaseFirestore.instance.collection('fridgeItems');
 
   return ingredientsFromFirestore
-      .where('userID', isEqualTo: uid)
+      .where('userId', isEqualTo: uid)
       .snapshots()
       .map((snap) => snap.docs
           .map((doc) => (doc.data()['name'] as String?) ?? '')

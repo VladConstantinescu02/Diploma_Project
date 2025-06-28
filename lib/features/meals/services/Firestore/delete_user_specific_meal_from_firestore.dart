@@ -15,7 +15,6 @@ class DeleteUserSpecificMealFromFireStore {
     required String userId,
   }) async {
     try {
-      print('Deleting meal with userId: $userId and mealId: $mealId');
 
       final query = await _firestore
           .collection('meals')
@@ -27,7 +26,9 @@ class DeleteUserSpecificMealFromFireStore {
       if (query.docs.isNotEmpty) {
         await query.docs.first.reference.delete();
       } else {
-        print("No matching meal found.");
+        if (kDebugMode) {
+          print("No matching meal found.");
+        }
       }
     } catch (e) {
       throw ('Error deleting specific meal: $e');

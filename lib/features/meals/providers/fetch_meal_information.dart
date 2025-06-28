@@ -18,7 +18,6 @@ final userMealsProvider = StreamProvider.family<List<Meal>, String>((ref, userId
 class FirestoreFetchMealInformation {
   final CollectionReference _mealsCollection = FirebaseFirestore.instance.collection('meals');
 
-  // Fetch all meals for a user
   Stream<List<Meal>> getMeals(String userId) {
     return _mealsCollection
         .where('userId', isEqualTo: userId)
