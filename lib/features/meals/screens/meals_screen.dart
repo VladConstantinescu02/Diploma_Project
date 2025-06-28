@@ -52,7 +52,7 @@ class MealScreenState extends ConsumerState<MealScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Lottie.asset(
-                    'lib/utils/images/search_animation.json',
+                    'lib/utils/images/initial_home_animation.json',
                     width: 300,
                     height: 300,
                   ),

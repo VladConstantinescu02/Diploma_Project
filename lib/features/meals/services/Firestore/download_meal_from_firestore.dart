@@ -1,6 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:open_file/open_file.dart';
@@ -26,7 +24,7 @@ class DownloadMealToDevice {
             child: pw.Container(
               child:
               pw.Text(
-                "🍽️ Meal card:",
+                "Meal card:",
                 style: pw.TextStyle(
                   fontWeight: pw.FontWeight.bold,
                   fontSize: 24,
