@@ -10,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import '../../../shared/widgets/loading_widget.dart';
 import '../../../shared/widgets/one_textbox_dialog_box.dart';
 import '../../../shared/errors/authentication_service_error_handling.dart';
 import '../../../shared/widgets/profile_picture.dart';
@@ -184,7 +185,7 @@ class ProfileScreen extends ConsumerWidget {
                               type: QuickAlertType.success,
                               text: 'Username is about to be updated',
                               autoCloseDuration:
-                                  const Duration(milliseconds: 500),
+                                  const Duration(milliseconds: 2),
                               confirmBtnColor: const Color(0xFFF27507),
                               confirmBtnText: 'OK',
                               // optional label
@@ -270,6 +271,7 @@ class ProfileScreen extends ConsumerWidget {
                                 fontWeight: FontWeight.w600,
                               ),
                               borderRadius: 48,
+                              barrierDismissible: true,
                             );
 
                             try {
@@ -344,6 +346,15 @@ class ProfileScreen extends ConsumerWidget {
                               dialogBackgroundColor: const Color(0xFFFAFAF9),
                               onSubmit: (email, password) async {
                                 try {
+                                  if (context.mounted) {
+                                    showDialog(
+                                      context: context,
+                                      barrierDismissible: false,
+                                      builder: (_) => const LoadingScreen(),
+                                    );
+                                  }
+
+
                                   final deleteUserService =
                                       ref.read(deleteUserServiceProvider);
                                   await deleteUserService.deleteAccount(

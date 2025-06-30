@@ -20,7 +20,7 @@ class SaveToFirestoreMealsService {
 
   Future<void> addMealToFireStore(
       {required Meal meal, required String userId}) async {
-    final mealID = uuid.v4();
+    final mealId = uuid.v4();
     await _mealsCollection.add({
       'name': meal.title,
       'imageURL': meal.image,
@@ -30,7 +30,7 @@ class SaveToFirestoreMealsService {
       'calories': _extractCalories(meal),
       'cuisine': meal.cuisine ?? '',
       'mealType': meal.mealType ?? '',
-      'mealId': mealID,
+      'mealId': mealId,
       'spoonacularID': meal.id.toString(),
       'userId': FirebaseAuth.instance.currentUser!.uid,
       'sourceUrl': meal.sourceUrl ?? '',

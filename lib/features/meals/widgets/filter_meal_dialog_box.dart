@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import '../../../shared/widgets/template_text_box_with_flag.dart';
 import '../../fridge/providers/get_user_ingredient_list_from_firebase.dart';
 import '../services/API/get_meal_api_instructions_service_api.dart';
@@ -59,15 +61,6 @@ class FilterMealState extends ConsumerState<FilerMeal> {
         : null; // empty → API ignores ingredient filter
 
     try {
-      print("Fetching meals with the following parameters:");
-      print("Cuisine: $cuisine");
-      print("Diet: $diet");
-      print("Intolerance: $intolerance");
-      print("Exclude Ingredients: $excludeIngredients");
-      print("Ingredients: $ingredientsArg");
-      print("Meal Type: $type");
-      print("Calories: $minCalories - $maxCalories");
-
       final results = await mealService.getMeal(
         number: resultCount.toInt(),
         cuisine: cuisine.isEmpty ? null : cuisine,
@@ -123,9 +116,15 @@ class FilterMealState extends ConsumerState<FilerMeal> {
         print("Error occurred: ${e.toString()}");
       }
       if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${e.toString()}")),
+          QuickAlert.show(
+            context: context,
+            type: QuickAlertType.error,
+            title: 'Oops…',
+            text: e.toString(),
+            confirmBtnColor: mainColor,
+            confirmBtnText: 'Got it',
+            barrierDismissible: true,
+            borderRadius: 48,
       );
     }
   }
