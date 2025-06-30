@@ -25,7 +25,7 @@ class MyApp extends ConsumerWidget {
     // Show loading screen while checking auth state
     if (authState.isLoading) {
       return const MaterialApp(
-        home: AuthLoadingScreen(),
+        home: LoadingScreen(),
       );
     }
 

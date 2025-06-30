@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
 
 import '../../../shared/errors/authentication_service_error_handling.dart';
+import '../../../shared/widgets/loading_widget.dart';
 import '../../../shared/widgets/template_obscured_input_field.dart';
 import '../services/authentication_service.dart';
 
@@ -108,6 +109,14 @@ class LoginScreen extends ConsumerWidget {
                           final authService = ref.read(authServiceProvider);
 
                           try {
+                            if (context.mounted) {
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (_) => const LoadingScreen(),
+                              );
+                            }
+
                             await authService.signIn(
                                 email: email, password: password);
 

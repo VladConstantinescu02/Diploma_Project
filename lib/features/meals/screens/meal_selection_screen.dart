@@ -1,3 +1,4 @@
+import 'package:diploma_prj/features/authentication/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +20,10 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
   final bool _isLoading = false;
   String? _error;
 
+  final Set<int> _savedMealIds = {};
+
+  bool _isMealSaved(Meal m) => _savedMealIds.contains(m.id);
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -34,7 +39,8 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
 
   List<String> filterHTMLElements(String response) {
     if (RegExp(r"<li>").hasMatch(response)) {
-      return RegExp(r"<li>(.*?)</li>", dotAll: true)        // dotAll ⇒ matches multiline
+      return RegExp(r"<li>(.*?)</li>",
+              dotAll: true) // dotAll ⇒ matches multiline
           .allMatches(response)
           .map((m) => m.group(1)!.trim())
           .toList();
@@ -169,10 +175,12 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
                                             padding: const EdgeInsets.symmetric(
                                                 vertical: 12),
                                             child: Text(
-                                              filterHTMLElements(meal.instructions!).join('\n'),
+                                              filterHTMLElements(
+                                                      meal.instructions!)
+                                                  .join('\n'),
                                               style: const TextStyle(
                                                   fontSize: 13,
-                                                  color: Colors.black87),
+                                                  color: Colors.black),
                                             ),
                                           ),
                                         ],
@@ -219,55 +227,76 @@ class _MealSelectionScreenState extends ConsumerState<MealSelectionScreen> {
                                           ],
                                         ),
                                       ),
-                                    ElevatedButton(
+                                    ElevatedButton.icon(
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor:
                                             const Color(0xFFF27507),
                                         elevation: 0,
                                       ),
-                                      onPressed: () async {
-                                        try {
-                                          final userId = FirebaseAuth
-                                              .instance.currentUser?.uid;
+                                      onPressed: _isMealSaved(meal)
+                                          ? null // disables the button completely
+                                          : () async {
+                                              setState(() =>
+                                                  _savedMealIds.add(meal.id));
 
-                                          if (userId == null) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              const SnackBar(
-                                                content:
-                                                    Text("User not logged in."),
-                                                backgroundColor:
-                                                    Color(0xFF8B1E3F),
-                                              ),
-                                            );
-                                            return;
-                                          }
+                                              try {
+                                                final uid = FirebaseAuth
+                                                    .instance.currentUser?.uid;
 
-                                          final saveMealService = ref.read(
-                                              saveToFirestoreMealsServiceProvider);
+                                                if (uid == null) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                          "User not logged in."),
+                                                      backgroundColor:
+                                                          Color(0xFF8B1E3F),
+                                                    ),
+                                                  );
+                                                  return;
+                                                }
 
-                                          await saveMealService
-                                              .addMealToFireStore(
-                                                  meal: meal, userId: userId);
-                                        } catch (e) {
-                                          if (!context.mounted) return;
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                              content: Text(
-                                                  "An unexpected error occurred: $e"),
-                                              backgroundColor:
-                                                  const Color(0xFF8B1E3F),
+                                                final saveMealService = ref.read(
+                                                    saveToFirestoreMealsServiceProvider);
+
+                                                await saveMealService
+                                                    .addMealToFireStore(
+                                                        meal: meal,
+                                                        userId: uid);
+                                              } catch (e) {
+                                                if (!context.mounted) return;
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  SnackBar(
+                                                    content: Text(
+                                                        "An unexpected error occurred: $e"),
+                                                    backgroundColor:
+                                                        const Color(0xFF8B1E3F),
+                                                  ),
+                                                );
+                                              }
+                                            },
+                                      label: _isMealSaved(
+                                              meal) // ④ label reflects state
+                                          ? const Text(
+                                              'Saved',
+                                              style:
+                                                  TextStyle(color: darkColor),
+                                            )
+                                          : const Text(
+                                              'Save to account',
+                                              style: TextStyle(
+                                                  color: backGroundColor),
                                             ),
-                                          );
-                                        }
-                                      },
-                                      child: const Text(
-                                        "Save to account",
-                                        style: TextStyle(
-                                          color: Color(0xFFFAFAF9),
-                                        ),
-                                      ),
+                                      icon: _isMealSaved(meal)
+                                          ? const Icon(
+                                              Icons.check,
+                                              color: darkColor,
+                                            )
+                                          : const Icon(
+                                              Icons.save,
+                                              color: backGroundColor,
+                                            ),
                                     ),
                                   ],
                                 ),

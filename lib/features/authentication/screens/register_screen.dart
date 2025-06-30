@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../shared/widgets/loading_widget.dart';
 import '../../../shared/widgets/text_box_widget.dart';
 import 'package:go_router/go_router.dart';
 
@@ -40,9 +41,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         setState(() => pickedImage = imageBytes);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Image selection failed: ${e.toString()}")),
-      );
+      if(context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Image selection failed: ${e.toString()}")),
+        );
+      }
     }
   }
 
@@ -65,6 +68,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final authService = ref.read(authServiceProvider);
 
     try {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const LoadingScreen(),
+        );
+      }
+
       final userCredential = await authService.createAccount(email: email, password: password);
       final user = userCredential.user;
 

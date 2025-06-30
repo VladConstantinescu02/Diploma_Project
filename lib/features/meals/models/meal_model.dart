@@ -8,7 +8,7 @@ class Meal {
   String? instructions;
   String? sourceName;
   String? sourceUrl;
-  String? mealType;          // ← will hold one of the 13 valid strings
+  String? mealType;
   String? cuisine;
   final String? mealId;
   List<dynamic>? ingredients;
@@ -29,7 +29,7 @@ class Meal {
     this.mealId,
   });
 
-  static const List<String> _validMealTypes = [
+  static const List<String> validMealTypes = [
     'main course',
     'side dish',
     'dessert',
@@ -47,15 +47,14 @@ class Meal {
   ];
 
   factory Meal.fromJson(Map<String, dynamic> json) {
-    // helper to extract a valid meal type
+
     String? extractMealType(Map<String, dynamic> j) {
-      // 1️⃣ single "type" key (rare)
       final rawType = (j['type'] ?? '').toString().toLowerCase();
-      if (_validMealTypes.contains(rawType)) return rawType;
+      if (validMealTypes.contains(rawType)) return rawType;
 
       final list = (j['dishTypes'] as List?)?.map((e) => e.toString().toLowerCase());
       return list?.firstWhere(
-            (e) => _validMealTypes.contains(e),
+            (e) => validMealTypes.contains(e),
         orElse: () => '',
       );
     }

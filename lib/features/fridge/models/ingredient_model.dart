@@ -39,9 +39,6 @@ class Ingredient {
     );
   }
 
-  // --------------------------------------------------------------------------
-  // Firestore helpers
-  // --------------------------------------------------------------------------
   factory Ingredient.fromFirestore(Map<String, dynamic> json, String docId) {
     return Ingredient(
       id: json['ingredientId'] as int,
@@ -68,9 +65,9 @@ class Ingredient {
     return Ingredient(
       id: json['id'],
       name: json['name'],
-      amount: 0.0, // default, user sets it later
-      unit: '',    // default, user sets it later
-      userId: '',  // set after login
+      amount: 0.0,
+      unit: '',
+      userId: '',
       nutrition: 0.0,
     );
   }

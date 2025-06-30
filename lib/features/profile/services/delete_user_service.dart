@@ -47,23 +47,19 @@ class DeleteUserService {
 
     final uid = user.uid;
 
-    // 1️⃣ Re-authenticate
     final cred =
     EmailAuthProvider.credential(email: email, password: password);
     await user.reauthenticateWithCredential(cred);
 
-    // 2️⃣ Delete meals & fridge items
     await _deleteMeals.deleteMeals(userId: uid);
     await _deleteFridge.deleteIngredients(userId: uid);
 
-    // 3️⃣ Delete profile picture (if any)
     try {
       await _storage.ref('users/$uid/profile_picture.jpg').delete();
     } on FirebaseException catch (e) {
       debugPrint('No profile picture to delete: ${e.code}');
     }
 
-    // 4️⃣ Delete user document & auth account
     await _firestore.collection('users').doc(uid).delete();
     await user.delete();
   }

@@ -1,10 +1,11 @@
 import 'package:diploma_prj/features/meals/services/FireStore/delete_user_specific_meal_from_firestore.dart';
+import 'package:diploma_prj/shared/widgets/alert_dialog_box.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-
+import 'package:quickalert/quickalert.dart';
 import '../models/meal_model.dart';
 import '../services/FireStore/download_meal_from_firestore.dart';
 import 'meal_info_drawer.dart';
@@ -29,19 +30,40 @@ class DisplayMealCard extends ConsumerWidget {
           motion: const BehindMotion(),
           children: [
             SlidableAction(
-              onPressed: (_) async {
-                final downloadService = ref.read(downloadMealToDeviceProvider);
-                try {
-                  await downloadService.generatePdf(meal);
-                } catch (e) {
-                  if(!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Failed to download PDF: $e'),
-                      backgroundColor: Colors.red,
+              onPressed: (BuildContext context) {
+                showDialog(
+                    context: context,
+                    builder: (context) => TemplateDialogBox(
+                        title: "Download meal",
+                        content: meal.title,
+                        textButtonColorCancel: backGroundColor,
+                        textButtonColorConfirm: backGroundColor,
+                        backgroundColor: backGroundColor,
+                        buttonCancel: secondaryColor,
+                        buttonConfirm: mainColor,
+                        onConfirm: () async {
+                          final downloadService = ref.read(downloadMealToDeviceProvider);
+                          try {
+                            await downloadService.generatePdf(meal);
+                          } catch (e) {
+                            if (!context.mounted) return;
+                            QuickAlert.show(context: context,
+                              type: QuickAlertType.error,
+                              text: 'Username is about to be updated',
+                              autoCloseDuration:
+                              const Duration(milliseconds: 2),
+                              confirmBtnColor: const Color(0xFFF27507),
+                              confirmBtnText: 'OK',
+                            );
+                          }
+                        },
+                      onCancel: () {
+                          if(context.mounted) {
+                            Navigator.pop(context);
+                          };
+                      },
                     ),
-                  );
-                }
+                );
               },
               icon: Icons.save,
               backgroundColor: const Color(0xFF3C4C59),
@@ -54,52 +76,65 @@ class DisplayMealCard extends ConsumerWidget {
               ),
             ),
             SlidableAction(
-              onPressed: (_) async {
-                try {
+              onPressed: (BuildContext context) {
+                showDialog(
+                  context: context,
+                  builder: (context) => TemplateDialogBox(
+                    title: 'You are about to delete',
+                    content: meal.title,
+                    textButtonColorCancel: backGroundColor,
+                    textButtonColorConfirm: backGroundColor,
+                    backgroundColor: backGroundColor,
+                    buttonCancel: secondaryColor,
+                    buttonConfirm: mainColor,
+                    onConfirm: () async {
+                      try {
+                        final userId = FirebaseAuth.instance.currentUser?.uid;
+                        final mealId = meal.mealId;
 
-                  final userId = FirebaseAuth.instance.currentUser?.uid;
-                  final mealId = meal.mealId;
+                        if (mealId == null) {
+                          if (kDebugMode) {
+                            print('Meal ID is null — cannot delete');
+                          }
+                          return;
+                        }
 
-                  if (mealId == null) {
-                    if (kDebugMode) {
-                      print('Meal ID is null — cannot delete');
-                    }
-                    return;
-                  }
+                        if (userId == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text("User not logged in."),
+                              backgroundColor: Color(0xFF8B1E3F),
+                            ),
+                          );
+                          return;
+                        }
 
+                        final deleteUserMealFromFireStore =
+                            ref.read(deleteUserSpecificMealProvider);
 
-                  if (userId == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("User not logged in."),
-                        backgroundColor: Color(0xFF8B1E3F),
-                      ),
-                    );
-                    return;
-                  }
-
-                  // This assumes you have a Provider<SaveToFirestoreMealsService>
-                  final deleteUserMealFromFireStore = ref.read(deleteUserSpecificMealProvider);
-
-                  await deleteUserMealFromFireStore.deleteUserSpecificMealFromFireStore(mealId: mealId, userId: userId);
-                } catch (e) {
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text("An unexpected error occurred: $e"),
-                      backgroundColor: const Color(0xFF8B1E3F),
-                    ),
-                  );
-                }
+                        await deleteUserMealFromFireStore
+                            .deleteUserSpecificMealFromFireStore(
+                                mealId: mealId, userId: userId);
+                      } catch (e) {
+                        if (!context.mounted) return;
+                        QuickAlert.show(context: context,
+                          type: QuickAlertType.error,
+                          text: 'Username is about to be updated',
+                          autoCloseDuration:
+                          const Duration(milliseconds: 2),
+                          confirmBtnColor: const Color(0xFFF27507),
+                          confirmBtnText: 'OK',
+                        );
+                      }
+                    },
+                  ),
+                );
               },
               icon: Icons.delete_sweep,
               backgroundColor: const Color(0xFF8B1E3F),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.zero,
-                bottomRight: Radius.circular(48),
-                // Leave other corners square
                 topRight: Radius.circular(48),
-                bottomLeft: Radius.zero
+                bottomRight: Radius.circular(48),
               ),
             ),
           ],
