@@ -40,7 +40,11 @@ class _FridgeScreenState extends ConsumerState<FridgeScreen> {
           ),
         ),
       body: asyncItems.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const Center(child: CircularProgressIndicator(
+          backgroundColor: backGroundColor,
+          valueColor: AlwaysStoppedAnimation(mainColor),
+          strokeWidth: 5,
+        )),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (items) {
           if (items.isEmpty) {
