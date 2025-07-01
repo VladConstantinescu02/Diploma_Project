@@ -51,6 +51,7 @@ dependencies:
   pdf: ^3.11.3
   open_file: ^3.5.10
   quickalert: ^1.1.0
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +83,7 @@ flutter:
   uses-material-design: true
   assets:
       - lib/utils/images/
+      - .env
 
   # To add assets to your application, add an assets section, like this:
   # assets:

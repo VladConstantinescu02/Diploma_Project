@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../../models/ingredient_model.dart';
 
@@ -6,7 +7,7 @@ import '../../models/ingredient_model.dart';
 
 class SearchIngredientsService {
 
-  final String _apiKey = 'bc0dd98ec2d8401291e11033be45a64a';
+  final String _apiKey = dotenv.env["API_KEY"]!;
 
   Future<List<Ingredient>> searchIngredients({
     required String query,

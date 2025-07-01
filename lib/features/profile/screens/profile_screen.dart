@@ -353,8 +353,6 @@ class ProfileScreen extends ConsumerWidget {
                                       builder: (_) => const LoadingScreen(),
                                     );
                                   }
-
-
                                   final deleteUserService =
                                       ref.read(deleteUserServiceProvider);
                                   await deleteUserService.deleteAccount(

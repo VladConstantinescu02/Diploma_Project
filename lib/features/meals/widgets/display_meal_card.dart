@@ -57,11 +57,6 @@ class DisplayMealCard extends ConsumerWidget {
                             );
                           }
                         },
-                      onCancel: () {
-                          if(context.mounted) {
-                            Navigator.pop(context);
-                          };
-                      },
                     ),
                 );
               },
@@ -119,7 +114,7 @@ class DisplayMealCard extends ConsumerWidget {
                         if (!context.mounted) return;
                         QuickAlert.show(context: context,
                           type: QuickAlertType.error,
-                          text: 'Username is about to be updated',
+                          text: 'Error in deleting meal',
                           autoCloseDuration:
                           const Duration(milliseconds: 2),
                           confirmBtnColor: const Color(0xFFF27507),

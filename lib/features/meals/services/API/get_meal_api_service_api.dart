@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../../models/meal_response.dart';
 
 class MealAPIService {
-  final String _apiKey = 'bc0dd98ec2d8401291e11033be45a64a';
+  final String _apiKey = dotenv.env["API_KEY"]!;
 
   Future<MealResponse?> getMeal({
     int? number,

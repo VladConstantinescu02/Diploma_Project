@@ -68,14 +68,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final authService = ref.read(authServiceProvider);
 
     try {
-      if (context.mounted) {
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (_) => const LoadingScreen(),
-        );
-      }
-
       final userCredential = await authService.createAccount(email: email, password: password);
       final user = userCredential.user;
 
@@ -85,7 +77,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
       await user.updateDisplayName(username);
 
-      // 🔑 Ensure token is fully active for Firestore & Storage
+
       await user.getIdToken(true);
 
       String? profilePhotoUrl;
@@ -105,6 +97,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
         'email': email,
         'profilePhoto': profilePhotoUrl ?? '',
       });
+
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (_) => const LoadingScreen(),
+        );
+      }
 
       if (!mounted) return;
       context.go('/login');
