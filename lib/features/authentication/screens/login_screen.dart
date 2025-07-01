@@ -109,6 +109,10 @@ class LoginScreen extends ConsumerWidget {
                           final authService = ref.read(authServiceProvider);
 
                           try {
+                            await authService.signIn(
+                                email: email, password: password
+                            );
+
                             if (context.mounted) {
                               showDialog(
                                 context: context,
@@ -116,9 +120,6 @@ class LoginScreen extends ConsumerWidget {
                                 builder: (_) => const LoadingScreen(),
                               );
                             }
-
-                            await authService.signIn(
-                                email: email, password: password);
 
                             if (!context.mounted) return;
                             context.go('/home');

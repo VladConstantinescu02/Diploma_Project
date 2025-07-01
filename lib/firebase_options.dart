@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -46,8 +47,8 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBVjyiSm2MYvMFKT1nDmY2z-rqWJYwbhl0',
+  static FirebaseOptions web = FirebaseOptions(
+    apiKey: dotenv.env["WEB_API_KEY"]!,
     appId: '1:507657497619:web:b5a264fb5b410b6953e3e6',
     messagingSenderId: '507657497619',
     projectId: 'diplomaprj-290fd',
@@ -56,16 +57,16 @@ class DefaultFirebaseOptions {
     measurementId: 'G-7C1X35FPLK',
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBX7-ei_Z-ngJu0Lf7ieoqRpadcnNGC5xs',
+  static FirebaseOptions android = FirebaseOptions(
+    apiKey: dotenv.env["ANDROID_API_KEY"]!,
     appId: '1:507657497619:android:73cfe208f3bcc36953e3e6',
     messagingSenderId: '507657497619',
     projectId: 'diplomaprj-290fd',
     storageBucket: 'diplomaprj-290fd.firebasestorage.app',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAhzosy-A3nJ8PRvLJSs-a8DFzmUzcJmRc',
+  static FirebaseOptions ios = FirebaseOptions(
+    apiKey: dotenv.env["IOS_API_KEY"]!,
     appId: '1:507657497619:ios:341fb0a4d6fa5f5f53e3e6',
     messagingSenderId: '507657497619',
     projectId: 'diplomaprj-290fd',
